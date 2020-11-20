@@ -33,6 +33,12 @@ private:
      */
     auto integer();
 
+    /**
+     * The Number allows the generation of a token of
+     * {integer, float, double}
+     */
+    auto number();
+
 public:
     //
     Lexer(const std::string buff) throw();

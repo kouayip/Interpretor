@@ -5,12 +5,14 @@
 
 enum TokenType
 {
-    INTEGER,
+    INTEGER_NUM,
+    FLOAT_NUM,
     PLUS_OP,
     MINUS_OP,
     MULT_OP,
     DIV_OP,
     MOD_OP,
+    _EOF_,
 };
 
 struct Location

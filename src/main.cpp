@@ -5,13 +5,12 @@
 
 int main()
 {
-    auto source{"12  \n   \n+  \n 23"};
+    auto source{" 12.24  \n   \n+  \n 23"};
 
     Lexer lex{source};
 
-    Asset::equals(lex.getCurrentChar(), '1');
-    Asset::equals(lex.look(), '2');
-    Utils::print(lex.getNextToken());
-    auto token{lex.getNextToken()};
-    Utils::print(token);
+    Asset::equals(lex.getNextToken().value, "12.24");
+    Asset::equals(lex.getNextToken().value, "+");
+    Asset::equals(lex.getNextToken().value, "23");
+    Asset::equals(lex.getNextToken().value, "\0");
 }
