@@ -8,14 +8,6 @@ Lexer::Lexer(const std::string buff) throw() : buff_(buff), cursor_(0)
     buffSize_ = buff.size() - 1;
 }
 
-void Lexer::skipWhitespace()
-{
-    while (currentChar_ != '\0' && std::isspace(currentChar_))
-    {
-        advance();
-    }
-}
-
 void Lexer::advance()
 {
     cursor_ += 1;
@@ -44,16 +36,44 @@ const char Lexer::look() const
     return buff_[cursorLook];
 }
 
+void Lexer::skipWhitespace()
+{
+    while (currentChar_ != '\0' && std::isspace(currentChar_))
+    {
+        advance();
+    }
+}
+
+auto Lexer::integer()
+{
+    std::string result("");
+    while (currentChar_ != '\0' && std::isdigit(currentChar_))
+    {
+        result += currentChar_;
+        advance();
+    }
+    return std::stoi(result);
+}
+
 void Lexer::getNextToken() //? Update laster
 {
     while (currentChar_ != '\0')
     {
+        //* Check a current char is white-space characters
         if (std::isspace(currentChar_))
         {
             advance();
             skipWhitespace();
             continue;
         }
+
+        //* Check a current char is digit
+        if (std::isdigit(currentChar_))
+        {
+            Utils::print(integer());
+            continue; //TODO: Change continue to return new token
+        }
+
         Utils::print(currentChar_);
         advance();
     }

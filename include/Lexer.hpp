@@ -23,6 +23,14 @@ private:
      */
     void advance();
 
+    /**
+     * The integer corresponds to all the digits
+     * in the buffer at the cursor position up 
+     * to a value other than one digit.
+     * ? The methode update property {currentChar_, cursor_}
+     */
+    auto integer();
+
 public:
     //
     Lexer(const std::string buff) throw();
