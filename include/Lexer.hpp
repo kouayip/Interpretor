@@ -2,6 +2,7 @@
 #define __LEXER__
 
 #include <iostream>
+#include "./Token.hpp"
 
 class Lexer
 {
@@ -9,6 +10,7 @@ private:
     const std::string buff_; //? Is a buffer content all input source code
     int buffSize_;           //? Is a size of the buffer
     int cursor_;             //? Cursor to define a position to a buffer
+    int ligne_;              //? Current line to cusor in buffer
     char currentChar_;       //? Is a current char of cursor to a buffer
 
     /**
@@ -43,7 +45,7 @@ public:
     const char look() const;
 
     // Genered next token
-    void getNextToken(); //TODO: Change return type to Token type
+    Token getNextToken(); // ? TODO: Change return type to Token type
 };
 
 #endif

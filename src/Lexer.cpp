@@ -2,7 +2,7 @@
 
 #include "../include/Utils.hpp"
 
-Lexer::Lexer(const std::string buff) throw() : buff_(buff), cursor_(0)
+Lexer::Lexer(const std::string buff) throw() : buff_(buff), cursor_(0), ligne_(1)
 {
     currentChar_ = buff[cursor_];
     buffSize_ = buff.size() - 1;
@@ -18,6 +18,8 @@ void Lexer::advance()
     else
     {
         currentChar_ = buff_[cursor_];
+        if (currentChar_ == '\n')
+            ligne_ += 1;
     }
 }
 
@@ -52,10 +54,11 @@ auto Lexer::integer()
         result += currentChar_;
         advance();
     }
-    return std::stoi(result);
+    //// return std::stoi(result);
+    return result;
 }
 
-void Lexer::getNextToken() //? Update laster
+Token Lexer::getNextToken() //? Update laster
 {
     while (currentChar_ != '\0')
     {
@@ -67,41 +70,42 @@ void Lexer::getNextToken() //? Update laster
             continue;
         }
 
+        const Location loc{ligne_, cursor_};
+
         //* Check a current char is digit
         if (std::isdigit(currentChar_))
         {
-            Utils::print(integer());
-            continue; //TODO: Change continue to return new token
+            return Token{TokenType::INTEGER, integer(), loc};
         }
 
         /**
          * Literals
          * * Op {+,-,*,/,%}
          */
+
         switch (currentChar_)
         {
         case '+':
-            /* code */
-            break;
+            advance();
+            return Token{TokenType::PLUS_OP, "+", loc};
         case '-':
-            /* code */
-            break;
+            advance();
+            return Token{TokenType::MINUS_OP, "-", loc};
         case '*':
-            /* code */
-            break;
+            advance();
+            return Token{TokenType::MULT_OP, "*", loc};
         case '/':
-            /* code */
-            break;
+            advance();
+            return Token{TokenType::DIV_OP, "/", loc};
         case '%':
-            /* code */
-            break;
+            advance();
+            return Token{TokenType::MOD_OP, "%", loc};
         default:
-            break; //? Show error
+            throw "Syntax error";
+            break;
         }
-
-        Utils::print(currentChar_);
-        advance();
     }
+    throw "Syntax error";
 }
 
 Lexer::~Lexer()
