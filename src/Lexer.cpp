@@ -74,6 +74,31 @@ void Lexer::getNextToken() //? Update laster
             continue; //TODO: Change continue to return new token
         }
 
+        /**
+         * Literals
+         * * Op {+,-,*,/,%}
+         */
+        switch (currentChar_)
+        {
+        case '+':
+            /* code */
+            break;
+        case '-':
+            /* code */
+            break;
+        case '*':
+            /* code */
+            break;
+        case '/':
+            /* code */
+            break;
+        case '%':
+            /* code */
+            break;
+        default:
+            break; //? Show error
+        }
+
         Utils::print(currentChar_);
         advance();
     }
