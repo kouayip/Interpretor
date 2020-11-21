@@ -11,6 +11,7 @@ private:
     int buffSize_;           //? Is a size of the buffer
     int cursor_;             //? Cursor to define a position to a buffer
     int ligne_;              //? Current line to cusor in buffer
+    int col_;                //? Current col to cursor in buffor
     char currentChar_;       //? Is a current char of cursor to a buffer
 
     /**
@@ -41,7 +42,7 @@ private:
 
 public:
     //
-    Lexer(const std::string buff) throw();
+    Lexer(std::string const(&buff)) throw();
     ~Lexer();
 
     // Get current char to cursor position
@@ -51,7 +52,7 @@ public:
     const char look() const;
 
     // Genered next token
-    Token getNextToken(); // ? TODO: Change return type to Token type
+    Token getNextToken();
 };
 
 #endif

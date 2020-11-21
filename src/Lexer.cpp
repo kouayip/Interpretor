@@ -2,7 +2,7 @@
 
 #include "../include/Utils.hpp"
 
-Lexer::Lexer(const std::string buff) throw() : buff_(buff), cursor_(0), ligne_(1)
+Lexer::Lexer(std::string const(&buff)) throw() : buff_(buff), cursor_(0), ligne_(1), col_(0)
 {
     currentChar_ = buff[cursor_];
     buffSize_ = buff.size() - 1;
@@ -18,8 +18,16 @@ void Lexer::advance()
     else
     {
         currentChar_ = buff_[cursor_];
+
         if (currentChar_ == '\n')
+        {
             ligne_ += 1;
+            col_ = -1;
+        }
+        else
+        {
+            col_ += 1;
+        }
     }
 }
 
@@ -60,7 +68,7 @@ auto Lexer::integer()
 
 auto Lexer::number()
 {
-    const Location loc{ligne_, cursor_};
+    const Location loc{ligne_, col_};
     std::string result(integer());
     if (currentChar_ == '.')
     {
@@ -80,11 +88,12 @@ Token Lexer::getNextToken() //? Update laster
         if (std::isspace(currentChar_))
         {
             advance();
-            skipWhitespace();
+            if (std::isspace(look()))
+                skipWhitespace();
             continue;
         }
 
-        const Location loc{ligne_, cursor_};
+        const Location loc{ligne_, col_};
 
         //* Check a current char is digit
         if (std::isdigit(currentChar_))
@@ -119,7 +128,7 @@ Token Lexer::getNextToken() //? Update laster
             break;
         }
     }
-    return Token{TokenType::_EOF_, "\0", Location{ligne_, cursor_}};
+    return Token{TokenType::_EOF_, "\0", Location{ligne_, col_}};
 }
 
 Lexer::~Lexer()
