@@ -2,18 +2,26 @@
 #define __PARSER__
 
 #include <iostream>
-#include "./Lexer.hpp"
+#include "Lexer.hpp"
+#include "./Utils.hpp"
 
 class Parser
 {
 private:
-    const Lexer lexer_;
+    Lexer lexer_;
+    Token currentToken_;
+
+    auto error();
+    void consume(TokenType const(&type));
+    auto factor();
+    auto term();
 
 public:
     Parser(std::string const(&buff)) throw();
     ~Parser();
 
-    const auto parse();
+    bool exp();
+    auto parse(); //? Change return type
 };
 
 #endif

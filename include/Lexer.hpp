@@ -52,7 +52,7 @@ public:
     const char look() const;
 
     // Genered next token
-    Token getNextToken();
+    const Token getNextToken();
 };
 
 #endif

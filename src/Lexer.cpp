@@ -80,7 +80,7 @@ auto Lexer::number()
     return Token{TokenType::INTEGER_NUM, result, loc};
 }
 
-Token Lexer::getNextToken() //? Update laster
+const Token Lexer::getNextToken() //? Update laster
 {
     while (currentChar_ != '\0')
     {
@@ -110,19 +110,19 @@ Token Lexer::getNextToken() //? Update laster
         {
         case '+':
             advance();
-            return Token{TokenType::PLUS_OP, "+", loc};
+            return Token{TokenType::PLUS_OP, '+', loc};
         case '-':
             advance();
-            return Token{TokenType::MINUS_OP, "-", loc};
+            return Token{TokenType::MINUS_OP, '-', loc};
         case '*':
             advance();
-            return Token{TokenType::MULT_OP, "*", loc};
+            return Token{TokenType::MULT_OP, '*', loc};
         case '/':
             advance();
-            return Token{TokenType::DIV_OP, "/", loc};
+            return Token{TokenType::DIV_OP, '/', loc};
         case '%':
             advance();
-            return Token{TokenType::MOD_OP, "%", loc};
+            return Token{TokenType::MOD_OP, '%', loc};
         default:
             throw "Syntax error";
             break;
