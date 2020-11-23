@@ -16,13 +16,12 @@ private:
     void consume(TokenType const(&type));
     Node *factor();
     Node *term();
+    Node *exp();
 
 public:
     Parser(std::string const(&buff)) throw();
     ~Parser();
-
-    Node *exp();
-    auto parse(); //? Change return type
+    Node *parse(); //? Change return type
 };
 
 #endif

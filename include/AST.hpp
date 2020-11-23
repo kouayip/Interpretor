@@ -9,6 +9,7 @@ enum NodeType
     AST = 99,
     NUM,
     OP,
+    Unary
 };
 
 /**
@@ -100,5 +101,40 @@ private:
     Token op_;
     Node *right_;
 };
+
+struct UnaryOp : Node
+{
+    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr), Node(NodeType::Unary) {}
+
+    const auto op() const
+    {
+        return op_;
+    }
+
+    const auto expr() const
+    {
+        return expr_;
+    }
+
+    virtual std::string print()
+    {
+        return "Unary";
+    }
+
+private:
+    Token op_;
+    Node *expr_;
+};
+
+//├──
+//└──
+//│
+inline void printTree(Node *node, const std::string &prefix)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+}
 
 #endif

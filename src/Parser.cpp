@@ -35,6 +35,16 @@ Node *Parser::factor()
 
         return new Num(token);
     }
+    else if (currentToken_.type() == TokenType::PLUS_OP ||
+             currentToken_.type() == TokenType::MINUS_OP)
+    {
+        const auto token{currentToken_};
+        if (currentToken_.type() == TokenType::PLUS_OP)
+            consume(TokenType::PLUS_OP);
+        else
+            consume(TokenType::MINUS_OP);
+        return new UnaryOp{token, exp()};
+    }
     else if (currentToken_.type() == TokenType::LPAREN_SYM)
     {
         consume(TokenType::LPAREN_SYM);
@@ -82,6 +92,14 @@ Node *Parser::exp()
     }
 
     return node;
+}
+
+Node *Parser::parse()
+{
+    auto tree{exp()};
+    if (currentToken_.type() != TokenType::_EOF_)
+        throw error();
+    return tree;
 }
 
 Parser::~Parser()
