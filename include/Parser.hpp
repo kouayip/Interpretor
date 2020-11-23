@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Lexer.hpp"
 #include "./Utils.hpp"
+#include "./AST.hpp"
 
 class Parser
 {
@@ -13,14 +14,14 @@ private:
 
     auto error();
     void consume(TokenType const(&type));
-    float factor();
-    float term();
+    Node *factor();
+    Node *term();
 
 public:
     Parser(std::string const(&buff)) throw();
     ~Parser();
 
-    float exp();
+    Node *exp();
     auto parse(); //? Change return type
 };
 
