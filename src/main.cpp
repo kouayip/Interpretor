@@ -2,6 +2,9 @@
 
 #include "../include/Parser.hpp"
 #include "../include/Asset.hpp"
+#include "../include/Type.hpp"
+
+auto glambda = [](auto a, auto &&b) { return a < b; };
 
 void lexerTestValue()
 {
@@ -12,13 +15,22 @@ void lexerTestValue()
     Asset::equals(lex.getNextToken().value(), std::string("23"));
 }
 
+template <typename T, typename V>
+constexpr auto sum(T a, V b) -> decltype(a + b)
+{
+    return a + b;
+}
+
 int main()
 {
-    //? Run Assertion test
+    //? Test
 
-    auto source{" 12.24  \n   \n+  \n 23"};
+    //? 7 + (((3 + 2))) = 12
+    auto source{"7 + (((3 + 2)))"}; // 10
 
     Parser parse{source};
 
-    parse.exp();
+    Utils::print(parse.exp());
+
+    return 0;
 }

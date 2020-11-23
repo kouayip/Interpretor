@@ -53,6 +53,8 @@ public:
 
     // Genered next token
     const Token getNextToken();
+
+    const auto tokenize();
 };
 
 #endif

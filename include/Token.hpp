@@ -7,11 +7,15 @@ enum TokenType
 {
     INTEGER_NUM,
     FLOAT_NUM,
+    //?Operator
     PLUS_OP,
     MINUS_OP,
     MULT_OP,
     DIV_OP,
     MOD_OP,
+    //?Special symbols
+    LPAREN_SYM,
+    RPAREN_SYM,
     _EOF_,
 };
 

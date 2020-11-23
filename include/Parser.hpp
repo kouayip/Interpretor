@@ -13,14 +13,14 @@ private:
 
     auto error();
     void consume(TokenType const(&type));
-    auto factor();
-    auto term();
+    float factor();
+    float term();
 
 public:
     Parser(std::string const(&buff)) throw();
     ~Parser();
 
-    bool exp();
+    float exp();
     auto parse(); //? Change return type
 };
 

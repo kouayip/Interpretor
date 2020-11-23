@@ -123,6 +123,12 @@ const Token Lexer::getNextToken() //? Update laster
         case '%':
             advance();
             return Token{TokenType::MOD_OP, '%', loc};
+        case '(':
+            advance();
+            return Token{TokenType::LPAREN_SYM, '(', loc};
+        case ')':
+            advance();
+            return Token{TokenType::RPAREN_SYM, ')', loc};
         default:
             throw "Syntax error";
             break;
