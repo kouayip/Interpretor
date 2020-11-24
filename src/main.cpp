@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 #include "../include/Parser.hpp"
 #include "../include/Interpretor.hpp"
@@ -26,20 +25,40 @@ void remove(Node *node)
 //TODO: Geret la gestion de la memoire des tree AST
 int main()
 {
-    //? 7 + (((3 + 2))) = 12
-    //? 5 - - - + - (3 + 4) - +2 = 10
-    auto source{"7 + 3 * (10 / (12 / (3 + 1) - 1)) / (2 + 3) - 5 - 3 + (8)"}; // 10
+    try
+    {
+        //? 7 + (((3 + 2))) = 12
+        //? 5 - - - + - (3 + 4) - +2 = 10
+        auto source{"((\n    set x = 5 - - - + - (3 + 4) - +2;\n    set y = read();\n    echo(x);\n))\n"}; // 10
 
-    Parser parse{source};
+        //? Test Lexer
+        Lexer lex{source};
+        while (true)
+        {
+            auto token = lex.getNextToken();
 
-    auto ast{parse.parse()};
+            token.print();
+            if (token.type() == TokenType::_EOF_)
+                break;
+        }
 
-    auto inter = Interpretor{};
+        return 0; //! test
 
-    Utils::print(inter.interpret(ast));
+        Parser parse{source};
 
-    // remove(ast);
-    // inter.clearRes();
+        auto ast{parse.parse()};
+
+        auto inter = Interpretor{};
+
+        Utils::print(inter.interpret(ast));
+
+        // remove(ast);
+        // inter.clearRes();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 
     return 0;
 }

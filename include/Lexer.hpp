@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include "./Token.hpp"
+#include <map>
+#include <stdexcept>
 
 class Lexer
 {
@@ -13,6 +15,20 @@ private:
     int ligne_;              //? Current line to cusor in buffer
     int col_;                //? Current col to cursor in buffor
     char currentChar_;       //? Is a current char of cursor to a buffer
+    std::map<std::string, TokenType> keywords_ = {
+        {"set", TokenType::SET_KWD},
+        {"read", TokenType::READ_KWD},
+        {"echo", TokenType::ECHO_KWD},
+    }; //? Is Defaut reserve keywords
+
+    /**
+     * Use to throw exception
+     */
+    void throwError();
+
+    /**
+     */
+    auto getLocation();
 
     /**
      * Skip all occurence of space to buff in cursor position
@@ -35,6 +51,11 @@ private:
     auto integer();
 
     /**
+     * The identifier corresponds to value match to /[a-b][a-b0-9]/i
+     */
+    auto identifier();
+
+    /**
      * The Number allows the generation of a token of
      * {integer, float, double}
      */
@@ -42,7 +63,7 @@ private:
 
 public:
     //
-    Lexer(std::string const(&buff)) throw();
+    Lexer(std::string const(&buff)) noexcept;
     ~Lexer();
 
     // Get current char to cursor position
@@ -54,6 +75,7 @@ public:
     // Genered next token
     const Token getNextToken();
 
+    // Get list of all token
     const auto tokenize();
 };
 

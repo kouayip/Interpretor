@@ -1,0 +1,13 @@
+((
+    set x = 10;
+    read(y);
+    echo(x);
+
+    <div class={display: flex, directory: row}>
+    {
+        <div>
+        {
+            
+        }
+    }
+))
