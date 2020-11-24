@@ -29,20 +29,20 @@ int main()
     {
         //? 7 + (((3 + 2))) = 12
         //? 5 - - - + - (3 + 4) - +2 = 10
-        auto source{"((\n    set x = 5 - - - + - (3 + 4) - +2;\n    set y = read();\n    echo(x);\n))\n"}; // 10
+        auto source{"((\n    set x = 5 - - - + - (3 + 4) - +2;\n))\n"}; // 10
 
-        //? Test Lexer
-        Lexer lex{source};
-        while (true)
-        {
-            auto token = lex.getNextToken();
+        // //? Test Lexer
+        // Lexer lex{source};
+        // while (true)
+        // {
+        //     auto token = lex.getNextToken();
 
-            token.print();
-            if (token.type() == TokenType::_EOF_)
-                break;
-        }
+        //     token.print();
+        //     if (token.type() == TokenType::_EOF_)
+        //         break;
+        // }
 
-        return 0; //! test
+        // return 0; //! test
 
         Parser parse{source};
 
@@ -50,7 +50,7 @@ int main()
 
         auto inter = Interpretor{};
 
-        Utils::print(inter.interpret(ast));
+        // Utils::print(inter.interpret(ast));
 
         // remove(ast);
         // inter.clearRes();

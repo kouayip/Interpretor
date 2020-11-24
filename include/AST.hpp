@@ -8,8 +8,11 @@ enum NodeType
 {
     AST = 99,
     NUM,
-    OP,
-    Unary
+    BIN_OP,
+    UNARY_OP,
+    PROGRAM,
+    VAR,
+    ASSIGN,
 };
 
 /**
@@ -72,9 +75,12 @@ private:
     double value_;
 };
 
+/**
+ * Binary operator
+ */
 struct BinOp : Node
 {
-    BinOp(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::OP) {}
+    BinOp(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::BIN_OP) {}
 
     const auto op() const
     {
@@ -102,9 +108,12 @@ private:
     Node *right_;
 };
 
+/**
+ * Unary operator
+ */
 struct UnaryOp : Node
 {
-    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr), Node(NodeType::Unary) {}
+    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr), Node(NodeType::UNARY_OP) {}
 
     const auto op() const
     {
@@ -124,6 +133,80 @@ struct UnaryOp : Node
 private:
     Token op_;
     Node *expr_;
+};
+
+/**
+ * Program root
+ */
+struct Program : Node
+{
+    Program() : Node(NodeType::PROGRAM)
+    {
+    }
+
+    virtual std::string print()
+    {
+        return "Program";
+    }
+    //! Programme content Node Block
+};
+
+/**
+ * Assign affectection
+ */
+struct Assign : Node
+{
+    Assign() : Node(NodeType::ASSIGN)
+    {
+    }
+
+    virtual std::string print()
+    {
+        return "Assign";
+    }
+
+    const auto op() const
+    {
+        return op_;
+    }
+
+    const auto left() const
+    {
+        return left_;
+    }
+
+    const auto right() const
+    {
+        return right_;
+    }
+
+private:
+    Node *left_;
+    Token op_;
+    Node *right_;
+};
+
+/**
+ * Variable
+ */
+struct Var : Node
+{
+    Var(Token const(&token)) : token_(token), Node(NodeType::VAR)
+    {
+    }
+
+    virtual std::string print()
+    {
+        return "Var";
+    }
+
+    const auto value()
+    {
+        return token_.value();
+    }
+
+private:
+    Token token_;
 };
 
 //├──

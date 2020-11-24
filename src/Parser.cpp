@@ -7,11 +7,14 @@ Parser::Parser(std::string const(&buff)) throw() : lexer_{buff}
 
 auto Parser::error()
 {
-    return std::string("Type error"); //TODO: Refactor code to create a generic class Error
+    // return std::string("Type error"); //TODO: Refactor code to create a generic class Error
+    return std::runtime_error("Type error");
 }
 
 void Parser::consume(TokenType const(&type))
 {
+    Utils::print(currentToken_); //! Test
+
     if (currentToken_.type() == type)
     {
         currentToken_ = lexer_.getNextToken();
@@ -20,6 +23,42 @@ void Parser::consume(TokenType const(&type))
     {
         throw error();
     }
+}
+
+Node *Parser::variable()
+{
+    auto token{currentToken_};
+    consume(TokenType::ID);
+    return new Var(token);
+}
+
+Node *Parser::program()
+{
+    //? Consume a declaration start program
+    consume(TokenType::LPAREN_SYM);
+    consume(TokenType::LPAREN_SYM);
+
+    auto condition = true;
+    while (condition)
+    {
+        switch (currentToken_.type())
+        {
+        case TokenType::SET_KWD:
+            consume(TokenType::SET_KWD);
+            break;
+
+        default:
+            condition = false;
+            break;
+        }
+    }
+
+    //? Consume a declaration end program
+    consume(TokenType::RPAREN_SYM);
+    consume(TokenType::RPAREN_SYM);
+
+    //! Program content a block intructions
+    return new Program();
 }
 
 Node *Parser::factor()
@@ -43,16 +82,19 @@ Node *Parser::factor()
             consume(TokenType::PLUS_OP);
         else
             consume(TokenType::MINUS_OP);
-        return new UnaryOp{token, exp()};
+        return new UnaryOp{token, expr()};
     }
     else if (currentToken_.type() == TokenType::LPAREN_SYM)
     {
         consume(TokenType::LPAREN_SYM);
-        const auto node{exp()};
+        const auto node{expr()};
         consume(TokenType::RPAREN_SYM);
         return node;
     }
-    throw error();
+    else
+    {
+        return variable();
+    }
 }
 
 Node *Parser::term()
@@ -75,7 +117,7 @@ Node *Parser::term()
     return node;
 }
 
-Node *Parser::exp()
+Node *Parser::expr()
 {
     auto node{term()};
 
@@ -96,7 +138,7 @@ Node *Parser::exp()
 
 Node *Parser::parse()
 {
-    auto tree{exp()};
+    auto tree{program()};
     if (currentToken_.type() != TokenType::_EOF_)
         throw error();
     return tree;

@@ -3,11 +3,25 @@
     read(y);
     echo(x);
 
-    <div class={display: flex, directory: row}>
+    if x == 2
     {
-        <div>
-        {
-            
-        }
+
     }
+    else
+    {
+
+    }
+
+    for 0 in 10
+    {
+        echo($);
+    }
+
+    # <div class={display: flex, directory: row}>
+    # {
+    #     <div>
+    #     {
+            
+    #     }
+    # }
 ))

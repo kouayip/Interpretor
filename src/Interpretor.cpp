@@ -13,7 +13,7 @@ auto Interpretor::visitNodeNum(Num *num)
 
 auto Interpretor::visitNode(Node *node)
 {
-    if (node->type() == NodeType::OP)
+    if (node->type() == NodeType::BIN_OP)
     {
         const auto result = visitNodeBinOp(static_cast<BinOp *>(node));
         close(node); //! Create Asyn delete;
@@ -25,7 +25,7 @@ auto Interpretor::visitNode(Node *node)
         close(node); //! Create Asyn delete;
         return result;
     }
-    else if (node->type() == NodeType::Unary)
+    else if (node->type() == NodeType::UNARY_OP)
     {
         const auto result = visitUnaryOp(static_cast<UnaryOp *>(node));
         close(node); //! Create Asyn delete;

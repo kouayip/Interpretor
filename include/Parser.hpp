@@ -14,9 +14,33 @@ private:
 
     auto error();
     void consume(TokenType const(&type));
+
+    /**
+     * Variable
+     */
+    Node *variable();
+
+    /**
+     * Programme root
+     */
+    Node *program();
+
+    //? Calculator Node ?//
+
+    /**
+     * 
+     */
     Node *factor();
+
+    /**
+     * 
+     */
     Node *term();
-    Node *exp();
+
+    /**
+     * Expression Calculator
+     */
+    Node *expr();
 
 public:
     Parser(std::string const(&buff)) throw();
