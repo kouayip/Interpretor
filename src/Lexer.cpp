@@ -172,7 +172,10 @@ const Token Lexer::getNextToken() //? Update laster
         case '<':
             advance();
             if (currentChar_ == '-')
+            {
+                advance();
                 return Token{TokenType::LASSIGN, "<-", lt};
+            }
             return Token{TokenType::LTHAN, '<', lt};
         case '>':
             advance();

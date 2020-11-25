@@ -18,6 +18,10 @@ private:
     std::map<std::string, TokenType> keywords_ = {
         {"const", TokenType::CONST},
         {"val", TokenType::VAL},
+        {"int", TokenType::INTEGER},
+        {"string", TokenType::STRING},
+        {"float", TokenType::REAL},
+        {"auto", TokenType::AUTO},
     }; //? Is Defaut reserve keywords
 
     /**

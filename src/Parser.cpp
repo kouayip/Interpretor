@@ -5,10 +5,10 @@ Parser::Parser(std::string const(&buff)) throw() : lexer_{buff}
     currentToken_ = lexer_.getNextToken();
 }
 
-auto Parser::error()
+auto Parser::error(std::string msg = "Type error")
 {
     // return std::string("Type error"); //TODO: Refactor code to create a generic class Error
-    return std::runtime_error("Type error");
+    return std::runtime_error(msg);
 }
 
 void Parser::consume(TokenType const(&type))
@@ -21,8 +21,172 @@ void Parser::consume(TokenType const(&type))
     }
     else
     {
+        Utils::print(std::string("Actual: "));
+        Utils::print(currentToken_.type());
+        Utils::print(std::string("Expected: "));
+        Utils::print(type);
         throw error();
     }
+}
+
+Node *Parser::program()
+{
+    //? Consume a declaration start program
+    consume(TokenType::LPAREN);
+    consume(TokenType::LPAREN);
+
+    auto const root = new Program{"Test", block()};
+
+    //? Consume a declaration end program
+    consume(TokenType::RPAREN);
+    consume(TokenType::RPAREN);
+
+    //! Program content a block intructions
+    return root;
+}
+
+Node *Parser::block()
+{
+    auto const block = new Block{};
+
+    //? Complete list of block {If statment ...}
+    if (currentToken_.type() == TokenType::VAL ||
+        currentToken_.type() == TokenType::CONST)
+    {
+        block->children.push_back(declarations());
+    }
+    else if (currentToken_.type() == TokenType::ID)
+    {
+        block->children.push_back(assignStatement());
+    }
+    else
+    {
+        throw error(); //! Change to empty block
+    }
+
+    return block;
+}
+
+Node *Parser::declarations()
+{
+    if (currentToken_.type() == TokenType::VAL)
+    {
+        consume(TokenType::VAL);
+        auto type = typeSpec();
+        auto decs = varDeclaration<ValDecl>(type);
+        consume(TokenType::SEMI);
+        return decs;
+    }
+    else if (currentToken_.type() == TokenType::CONST)
+    {
+        consume(TokenType::CONST);
+        auto type = typeSpec();
+        auto decs = varDeclaration<ConstDecl>(type);
+        consume(TokenType::SEMI);
+        return decs;
+    }
+
+    throw error();
+}
+
+template <typename T, class VarDecl>
+Node *Parser::varDeclaration(Node *&type)
+{
+    if (currentToken_.type() == TokenType::LCURLY)
+    {
+        consume(TokenType::LCURLY);
+        if (currentToken_.type() == TokenType::ID)
+        {
+            Node *nodes = varDeclaration<T>(type);
+            consume(TokenType::RCURLY);
+            return nodes;
+        }
+        throw error();
+    }
+
+    auto const nodes = new CompoundDecl{};
+    auto prevVarPosLine = -1; //? Save last position line the prev var
+    auto index = -1;          //? index frist multy declaration
+    auto cpt = 0;             //? number of declarations
+    auto isMulDecl = false;   // Check is si Multy declaration or unique declaration
+    auto isAssign = false;
+    while (currentToken_.type() == TokenType::ID)
+    {
+        auto pos = currentToken_.location().line;
+
+        if (pos == prevVarPosLine && !isAssign)
+        {
+            isMulDecl = true;
+        }
+        else if (isMulDecl)
+        {
+            isMulDecl = false;
+            index = nodes->children.size();
+        }
+        else if (isAssign)
+        {
+            index = nodes->children.size();
+        }
+        else
+        {
+            index++;
+        }
+
+        auto var = variable();
+
+        nodes->children.push_back(new ValDecl{var, type});
+
+        if (isAssign = (currentToken_.type() == TokenType::LASSIGN))
+        {
+            if (isMulDecl)
+            {
+                const auto op = currentToken_;
+                consume(TokenType::LASSIGN);
+                auto mAssign = new MultAssign{op, expr()};
+                auto size = nodes->children.size();
+                for (size_t i = index; i < size; i++)
+                {
+                    Utils::print(i);
+                    mAssign->pushVar(nodes->children[i]->reveal<ValDecl *>()->var());
+                }
+
+                mAssign->pushVar(var);
+
+                nodes->children.push_back(mAssign);
+            }
+            else
+            {
+                nodes->children.push_back(assignStatement(var));
+            }
+        }
+
+        prevVarPosLine = pos; //? Update last position
+
+        if (currentToken_.type() == TokenType::SEMI ||
+            currentToken_.type() == TokenType::RCURLY)
+            break;
+
+        consume(TokenType::COMMA);
+    }
+    return nodes;
+}
+
+Node *Parser::constDeclaration() //TODO: Refact code to Generic Declaration
+{
+    return nullptr; //! Test
+}
+
+Node *Parser::assignStatement()
+{
+    auto var = variable();
+    return assignStatement(var);
+}
+
+Node *Parser::assignStatement(Node *&var)
+{
+    const auto op = currentToken_;
+    consume(TokenType::LASSIGN);
+    return new Assign{var, op, expr()};
 }
 
 Node *Parser::variable()
@@ -32,33 +196,26 @@ Node *Parser::variable()
     return new Var(token);
 }
 
-Node *Parser::program()
+Node *Parser::typeSpec()
 {
-    //? Consume a declaration start program
-    consume(TokenType::LPAREN);
-    consume(TokenType::LPAREN);
+    consume(TokenType::LTHAN);
 
-    auto condition = true;
-    while (condition)
-    {
-        switch (currentToken_.type())
-        {
-        case TokenType::VAL:
-            consume(TokenType::VAL);
-            break;
+    const auto token = currentToken_;
 
-        default:
-            condition = false;
-            break;
-        }
-    }
+    if (currentToken_.type() == TokenType::INTEGER)
+        consume(TokenType::INTEGER);
+    else if (currentToken_.type() == TokenType::REAL)
+        consume(TokenType::REAL);
+    else if (currentToken_.type() == TokenType::STRING)
+        consume(TokenType::STRING);
+    else if (currentToken_.type() == TokenType::BOOL)
+        consume(TokenType::BOOL);
+    else if (currentToken_.type() == TokenType::AUTO)
+        consume(TokenType::AUTO);
 
-    //? Consume a declaration end program
-    consume(TokenType::RPAREN);
-    consume(TokenType::RPAREN);
+    consume(TokenType::GTHAN);
 
-    //! Program content a block intructions
-    return new Program();
+    return new VarType(token);
 }
 
 Node *Parser::factor()

@@ -6,10 +6,16 @@
 enum TokenType
 {
     //? Identifiers and literals
-    ID,     // (identify)
-    INUM,   // (Integer number)
-    FNUM,   // (float number)
-    STRING, // (string)
+    ID,   // (identify)
+    INUM, // (Integer number)
+    FNUM, // (float number)
+
+    //? Identity type of var
+    INTEGER, // (int)
+    REAL,    // (float)
+    STRING,  // (string)
+    BOOL,    // (boolean)
+    AUTO,    // (auto)
 
     //? Arithmetic Operator
     PLUS,  // (+)
@@ -72,6 +78,18 @@ inline std::ostream &operator<<(std::ostream &op, TokenType type)
         break;
     case TokenType::STRING:
         op << "STRING";
+        break;
+    case TokenType::INTEGER:
+        op << "INTEGER";
+        break;
+    case TokenType::REAL:
+        op << "REAL";
+        break;
+    case TokenType::BOOL:
+        op << "BOOL";
+        break;
+    case TokenType::AUTO:
+        op << "AUTO";
         break;
     case TokenType::PLUS:
         op << "PLUS";

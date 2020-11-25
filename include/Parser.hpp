@@ -12,13 +12,50 @@ private:
     Lexer lexer_;
     Token currentToken_;
 
-    auto error();
+    auto error(std::string msg);
+
     void consume(TokenType const(&type));
+
+    /**
+     * Statement
+     */
+    Node *statement();
+
+    /**
+     * Assignement
+     */
+    Node *assignStatement(Node *&var);
+
+    Node *assignStatement();
+
+    //
+    Node *declarations();
+
+    /**
+     * Declaration val 
+     */
+    template <typename T, typename = std::enable_if<std::is_base_of<VarDecl, T>::value>>
+    Node *varDeclaration(Node *&type);
+
+    /**
+     * Declaration const 
+     */
+    Node *constDeclaration();
 
     /**
      * Variable
      */
     Node *variable();
+
+    /**
+     * Variable
+     */
+    Node *typeSpec();
+
+    /**
+     * 
+     */
+    Node *block();
 
     /**
      * Programme root

@@ -3,6 +3,7 @@
     {
         x <- 10 + 9,
         y <- 3,
+        v,
     };
 
     val<string>
@@ -17,6 +18,8 @@
 
     };
 
+    val<auto> y,n,p <- 10;
+
     // Permutation
     a <-> b;
 
@@ -26,7 +29,7 @@
 
     if x eq 2
     {
-
+        val<auto> p <- 10;
     }
     else
     {

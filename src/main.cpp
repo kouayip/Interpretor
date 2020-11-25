@@ -22,6 +22,11 @@ void remove(Node *node)
     }
 }
 
+Node *nodeTest()
+{
+    auto token = Token{TokenType::MINUS, '-', Location{}};
+    return new Var{token};
+}
 //TODO: Geret la gestion de la memoire des tree AST
 int main()
 {
@@ -29,7 +34,13 @@ int main()
     {
         //? 7 + (((3 + 2))) = 12
         //? 5 - - - + - (3 + 4) - +2 = 10
-        auto source{"((\n    const<int>\n{ x <- 10.8 + 9,\n y <- 3,};\n))\n"}; // 10
+        auto source{"((\n"
+                    "val<int>\n{\n"
+                    "x <- 3,\n"
+                    "y,z <- 10.8 + 9,\n"
+                    "t"
+                    "};\n"
+                    "))\n"}; // 10
 
         //? Test Lexer
         // Lexer lex{source};
@@ -50,7 +61,7 @@ int main()
 
         auto inter = Interpretor{};
 
-        // Utils::print(inter.interpret(ast));
+        inter.interpret(ast);
 
         // remove(ast);
         // inter.clearRes();
