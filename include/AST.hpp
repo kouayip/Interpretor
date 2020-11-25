@@ -12,6 +12,10 @@ enum NodeType
     UNARYOP,
     PROGRAM,
     VAR,
+    VARDECL,
+    CONSTDECL,
+    AUTODECL,
+    VARTYPE,
     DECL,
     ASSIGN,
 };
@@ -188,7 +192,7 @@ private:
 };
 
 /**
- * Variable
+ * Variable {val<type> and const<type>}
  */
 struct Var : Node
 {
@@ -201,21 +205,85 @@ struct Var : Node
         return "Var";
     }
 
-    const auto value()
+    // ? Return name of variable
+    const auto name()
     {
         return token_.value();
     }
 
-protected:
+private:
     Token token_;
 };
 
-struct VarDecl : Var
+struct VarType : Node
 {
-    VarDecl(Token const(&token)) : Var(token)
+    VarType(Token const(&token)) : token_(token), Node(NodeType::VARTYPE) {}
+
+    // ? Return type of variable
+    const auto type()
     {
-        this->type_ = NodeType::VAR;
+        return token_.value();
     }
+
+    virtual std::string print()
+    {
+        return "VarDecl";
+    }
+
+private:
+    Token token_;
+};
+
+/**
+ * Variable Declaration {x <- number,}
+ * And define a type of variable
+ */
+struct VarDecl : Node
+{
+    VarDecl(Node *type, Node *var) : type_(type), var_(var), Node(NodeType::VARDECL) {}
+
+    VarDecl(Node *type, Node *var, NodeType const(&nodeType)) : Node(nodeType) {}
+
+    virtual std::string print()
+    {
+        return "VarDecl";
+    }
+
+    virtual const Node *type()
+    {
+        return this->type_;
+    }
+
+    virtual const Node *var()
+    {
+        return this->var_;
+    }
+
+protected:
+    Node *type_;
+    Node *var_;
+};
+
+/**
+ * Constant variable Declaration
+ */
+struct ConstDecl : VarDecl
+{
+    ConstDecl(Node *type, Node *var) : VarDecl(type, var, NodeType::CONSTDECL) {}
+
+    virtual std::string print()
+    {
+        return "VarDecl";
+    }
+};
+
+/**
+ * Automatique variable Declaration
+ * Resove type of var afta affectation
+ */
+struct AutoDecl : VarDecl
+{
+    AutoDecl(Node *type, Node *var) : VarDecl(type, var, NodeType::AUTODECL) {}
 
     virtual std::string print()
     {
@@ -226,7 +294,8 @@ struct VarDecl : Var
 //├──
 //└──
 //│
-inline void printTree(Node *node, const std::string &prefix)
+inline void
+printTree(Node *node, const std::string &prefix)
 {
     if (node == nullptr)
     {
