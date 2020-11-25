@@ -97,9 +97,9 @@ auto Lexer::number()
         result += currentChar_;
         advance();
         result += integer();
-        return Token{TokenType::FLOAT_NUM, result, lt};
+        return Token{TokenType::FNUM, result, lt};
     }
-    return Token{TokenType::INTEGER_NUM, result, lt};
+    return Token{TokenType::INUM, result, lt};
 }
 
 const Token Lexer::getNextToken() //? Update laster
@@ -138,31 +138,28 @@ const Token Lexer::getNextToken() //? Update laster
         {
         case '+':
             advance();
-            return Token{TokenType::PLUS_OP, '+', lt};
+            return Token{TokenType::PLUS, '+', lt};
         case '-':
             advance();
-            return Token{TokenType::MINUS_OP, '-', lt};
+            return Token{TokenType::MINUS, '-', lt};
         case '*':
             advance();
-            return Token{TokenType::MULT_OP, '*', lt};
+            return Token{TokenType::MULT, '*', lt};
         case '/':
             advance();
-            return Token{TokenType::DIV_OP, '/', lt};
+            return Token{TokenType::DIV, '/', lt};
         case '%':
             advance();
-            return Token{TokenType::MOD_OP, '%', lt};
+            return Token{TokenType::MOD, '%', lt};
         case '(':
             advance();
-            return Token{TokenType::LPAREN_SYM, '(', lt};
+            return Token{TokenType::LPAREN, '(', lt};
         case ')':
             advance();
-            return Token{TokenType::RPAREN_SYM, ')', lt};
-        case '=':
-            advance();
-            return Token{TokenType::ASSIGN_SYM, '=', lt};
+            return Token{TokenType::RPAREN, ')', lt};
         case ';':
             advance();
-            return Token{TokenType::SEMI_SYM, ';', lt};
+            return Token{TokenType::SEMI, ';', lt};
         default:
             throwError();
             break;

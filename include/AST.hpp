@@ -8,10 +8,11 @@ enum NodeType
 {
     AST = 99,
     NUM,
-    BIN_OP,
-    UNARY_OP,
+    BINOP,
+    UNARYOP,
     PROGRAM,
     VAR,
+    DECL,
     ASSIGN,
 };
 
@@ -80,7 +81,7 @@ private:
  */
 struct BinOp : Node
 {
-    BinOp(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::BIN_OP) {}
+    BinOp(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::BINOP) {}
 
     const auto op() const
     {
@@ -113,7 +114,7 @@ private:
  */
 struct UnaryOp : Node
 {
-    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr), Node(NodeType::UNARY_OP) {}
+    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr), Node(NodeType::UNARYOP) {}
 
     const auto op() const
     {
@@ -156,7 +157,7 @@ struct Program : Node
  */
 struct Assign : Node
 {
-    Assign() : Node(NodeType::ASSIGN)
+    Assign(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::ASSIGN)
     {
     }
 
@@ -205,8 +206,21 @@ struct Var : Node
         return token_.value();
     }
 
-private:
+protected:
     Token token_;
+};
+
+struct VarDecl : Var
+{
+    VarDecl(Token const(&token)) : Var(token)
+    {
+        this->type_ = NodeType::VAR;
+    }
+
+    virtual std::string print()
+    {
+        return "VarDecl";
+    }
 };
 
 //├──

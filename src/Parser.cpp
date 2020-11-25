@@ -35,16 +35,16 @@ Node *Parser::variable()
 Node *Parser::program()
 {
     //? Consume a declaration start program
-    consume(TokenType::LPAREN_SYM);
-    consume(TokenType::LPAREN_SYM);
+    consume(TokenType::LPAREN);
+    consume(TokenType::LPAREN);
 
     auto condition = true;
     while (condition)
     {
         switch (currentToken_.type())
         {
-        case TokenType::SET_KWD:
-            consume(TokenType::SET_KWD);
+        case TokenType::VAL:
+            consume(TokenType::VAL);
             break;
 
         default:
@@ -54,8 +54,8 @@ Node *Parser::program()
     }
 
     //? Consume a declaration end program
-    consume(TokenType::RPAREN_SYM);
-    consume(TokenType::RPAREN_SYM);
+    consume(TokenType::RPAREN);
+    consume(TokenType::RPAREN);
 
     //! Program content a block intructions
     return new Program();
@@ -63,32 +63,32 @@ Node *Parser::program()
 
 Node *Parser::factor()
 {
-    if (currentToken_.type() == TokenType::INTEGER_NUM ||
-        currentToken_.type() == TokenType::FLOAT_NUM)
+    if (currentToken_.type() == TokenType::INUM ||
+        currentToken_.type() == TokenType::FNUM)
     {
         const auto token{currentToken_};
-        if (currentToken_.type() == TokenType::INTEGER_NUM)
-            consume(TokenType::INTEGER_NUM);
+        if (currentToken_.type() == TokenType::INUM)
+            consume(TokenType::INUM);
         else
-            consume(TokenType::FLOAT_NUM);
+            consume(TokenType::FNUM);
 
         return new Num(token);
     }
-    else if (currentToken_.type() == TokenType::PLUS_OP ||
-             currentToken_.type() == TokenType::MINUS_OP)
+    else if (currentToken_.type() == TokenType::PLUS ||
+             currentToken_.type() == TokenType::MINUS)
     {
         const auto token{currentToken_};
-        if (currentToken_.type() == TokenType::PLUS_OP)
-            consume(TokenType::PLUS_OP);
+        if (currentToken_.type() == TokenType::PLUS)
+            consume(TokenType::PLUS);
         else
-            consume(TokenType::MINUS_OP);
+            consume(TokenType::MINUS);
         return new UnaryOp{token, expr()};
     }
-    else if (currentToken_.type() == TokenType::LPAREN_SYM)
+    else if (currentToken_.type() == TokenType::LPAREN)
     {
-        consume(TokenType::LPAREN_SYM);
+        consume(TokenType::LPAREN);
         const auto node{expr()};
-        consume(TokenType::RPAREN_SYM);
+        consume(TokenType::RPAREN);
         return node;
     }
     else
@@ -101,17 +101,17 @@ Node *Parser::term()
 {
     auto node{factor()};
 
-    while (currentToken_.type() == TokenType::MULT_OP ||
-           currentToken_.type() == TokenType::DIV_OP ||
-           currentToken_.type() == TokenType::MOD_OP)
+    while (currentToken_.type() == TokenType::MULT ||
+           currentToken_.type() == TokenType::DIV ||
+           currentToken_.type() == TokenType::MOD)
     {
         auto token = currentToken_;
-        if (currentToken_.type() == TokenType::MULT_OP)
-            consume(TokenType::MULT_OP);
-        else if (currentToken_.type() == TokenType::DIV_OP)
-            consume(TokenType::DIV_OP);
-        else if (currentToken_.type() == TokenType::MOD_OP)
-            consume(TokenType::MOD_OP);
+        if (currentToken_.type() == TokenType::MULT)
+            consume(TokenType::MULT);
+        else if (currentToken_.type() == TokenType::DIV)
+            consume(TokenType::DIV);
+        else if (currentToken_.type() == TokenType::MOD)
+            consume(TokenType::MOD);
         node = new BinOp(node, token, factor());
     }
     return node;
@@ -121,14 +121,14 @@ Node *Parser::expr()
 {
     auto node{term()};
 
-    while (currentToken_.type() == TokenType::PLUS_OP ||
-           currentToken_.type() == TokenType::MINUS_OP)
+    while (currentToken_.type() == TokenType::PLUS ||
+           currentToken_.type() == TokenType::MINUS)
     {
         auto token = currentToken_;
-        if (currentToken_.type() == TokenType::PLUS_OP)
-            consume(TokenType::PLUS_OP);
-        else if (currentToken_.type() == TokenType::MINUS_OP)
-            consume(TokenType::MINUS_OP);
+        if (currentToken_.type() == TokenType::PLUS)
+            consume(TokenType::PLUS);
+        else if (currentToken_.type() == TokenType::MINUS)
+            consume(TokenType::MINUS);
 
         node = new BinOp(node, token, term());
     }

@@ -29,20 +29,20 @@ int main()
     {
         //? 7 + (((3 + 2))) = 12
         //? 5 - - - + - (3 + 4) - +2 = 10
-        auto source{"((\n    set x = 5 - - - + - (3 + 4) - +2;\n))\n"}; // 10
+        auto source{"((\n    const<int>\n{ x <- 10 + 9,\n y <- 3,};\n))\n"}; // 10
 
-        // //? Test Lexer
-        // Lexer lex{source};
-        // while (true)
-        // {
-        //     auto token = lex.getNextToken();
+        //? Test Lexer
+        Lexer lex{source};
+        while (true)
+        {
+            auto token = lex.getNextToken();
 
-        //     token.print();
-        //     if (token.type() == TokenType::_EOF_)
-        //         break;
-        // }
+            token.print();
+            if (token.type() == TokenType::_EOF_)
+                break;
+        }
 
-        // return 0; //! test
+        return 0; //! test
 
         Parser parse{source};
 

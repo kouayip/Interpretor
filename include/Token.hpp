@@ -5,40 +5,54 @@
 
 enum TokenType
 {
-    //?Identifier
-    ID, //* [a-bA-B]+[a-bA-B-0-9]
+    //? Identifiers and literals
+    ID,     // (identify)
+    INUM,   // (Integer number)
+    FNUM,   // (float number)
+    STRING, // (string)
 
-    //?Number
-    INTEGER_NUM, //* [0-9]+
-    FLOAT_NUM,   //* [0-9]+.[0-9]+
+    //? Arithmetic Operator
+    PLUS,  // (+)
+    MINUS, // (-)
+    MULT,  // (*)
+    DIV,   // (/)
+    MOD,   // (%)
 
-    //?Operator
-    PLUS_OP,  //* +
-    MINUS_OP, //* -
-    MULT_OP,  //**
-    DIV_OP,   //* /
-    MOD_OP,   //* %
+    //? Special symbols
+    LPAREN, // <)>
+    RPAREN, // <(>
+    LCURLY, // <{>
+    RCURLY, // <}>
+    COLON,  // <:>
+    SEMI,   // <;>
+    DOT,    // <.>
 
-    //?Special symbols
-    LPAREN_SYM, //* )
-    RPAREN_SYM, //* (
-    LCURLY_SYM, //* {
-    RCURLY_SYM, //* }
-    ASSIGN_SYM, //* =
-    COLON_SYM,  //* :
-    SEMI_SYM,   //* ;
-    DOT_SYM,    //* .
+    //? Conditon operator
+    LTHAN,   // (<)
+    GTHAN,   // (>)
+    EQUAL,   // (==)
+    LTEQUAL, // (<=)
+    GTEQUAL, // (>=)
+    INEQUAL, // (!=)
+
+    //? Assignment operator
+    LASSIGN,  // (<-)
+    RASSIGN,  // (->)
+    LRASSIGN, // (<->)
 
     //? Keywords
-    SET_KWD,  //* set
-    ECHO_KWD, //* echo
-    READ_KWD, //* read
+    VAL,    // (val)
+    CONST,  // (const)
+    STRUCT, // (struct)
+    IF,     // (if)
+    ELSE,   // (else)
+    ELSEIF, // (else if)
+    FOR,    // (for)
+    PRINT,  // (echo)
+    READ,   // (read)
 
-    //? HTML Keywords
-    DIV, //* <div>
-
-    //?
-    _EOF_, //* end line
+    //? Special tokens
+    _EOF_, //* end of input
 };
 
 inline std::ostream &operator<<(std::ostream &op, TokenType type)
@@ -47,54 +61,6 @@ inline std::ostream &operator<<(std::ostream &op, TokenType type)
     {
     case TokenType::ID:
         op << "ID";
-        break;
-    case TokenType::INTEGER_NUM:
-        op << "INTEGER";
-        break;
-    case TokenType::FLOAT_NUM:
-        op << "FLOAT";
-        break;
-    case TokenType::PLUS_OP:
-        op << "PLUS";
-        break;
-    case TokenType::MINUS_OP:
-        op << "MINUS";
-        break;
-    case TokenType::MULT_OP:
-        op << "MULT";
-        break;
-    case TokenType::DIV_OP:
-        op << "DIV";
-        break;
-    case TokenType::MOD_OP:
-        op << "MOD";
-        break;
-    case TokenType::LPAREN_SYM:
-        op << "LPAREN";
-        break;
-    case TokenType::RPAREN_SYM:
-        op << "RPAREN";
-        break;
-    case TokenType::LCURLY_SYM:
-        op << "LCURLY";
-        break;
-    case TokenType::RCURLY_SYM:
-        op << "RCURLY";
-        break;
-    case TokenType::SET_KWD:
-        op << "SET";
-        break;
-    case TokenType::READ_KWD:
-        op << "READ";
-        break;
-    case TokenType::ECHO_KWD:
-        op << "ECHO";
-        break;
-    case TokenType::SEMI_SYM:
-        op << "SEMI";
-        break;
-    case TokenType::ASSIGN_SYM:
-        op << "ASSIGN";
         break;
     case TokenType::_EOF_:
         op << "EOF";

@@ -1,9 +1,30 @@
 ((
-    set x = 10;
-    read(y);
-    echo(x);
+    const<int>
+    {
+        x <- 10 + 9,
+        y <- 3,
+    };
 
-    if x == 2
+    val<string>
+    {
+        name <- "Yves",
+    };
+
+    val<auto>
+    {
+        y,n,p <- 10,
+        m <- "fdfd",
+
+    };
+
+    // Permutation
+    a <-> b;
+
+    a -> b;
+
+    a <- b;
+
+    if x eq 2
     {
 
     }
@@ -12,16 +33,24 @@
 
     }
 
-    for 0 in 10
+    for 0 -> 10
     {
-        echo($);
+        print(-);
     }
 
-    # <div class={display: flex, directory: row}>
-    # {
-    #     <div>
-    #     {
+    struct<T> User(T name) : name_(name)
+    {
+        func<auto> name()
+        {
+            return "Yves";   
+        };
+    }
+
+    //  <div class={display: flex, directory: row}>
+    //  {
+    //      <div>
+    //      {
             
-    #     }
-    # }
+    //      }
+    // }
 ))

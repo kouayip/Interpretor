@@ -13,7 +13,7 @@ auto Interpretor::visitNodeNum(Num *num)
 
 auto Interpretor::visitNode(Node *node)
 {
-    if (node->type() == NodeType::BIN_OP)
+    if (node->type() == NodeType::BINOP)
     {
         const auto result = visitNodeBinOp(static_cast<BinOp *>(node));
         close(node); //! Create Asyn delete;
@@ -25,7 +25,7 @@ auto Interpretor::visitNode(Node *node)
         close(node); //! Create Asyn delete;
         return result;
     }
-    else if (node->type() == NodeType::UNARY_OP)
+    else if (node->type() == NodeType::UNARYOP)
     {
         const auto result = visitUnaryOp(static_cast<UnaryOp *>(node));
         close(node); //! Create Asyn delete;
@@ -36,7 +36,7 @@ auto Interpretor::visitNode(Node *node)
 
 double Interpretor::visitUnaryOp(UnaryOp *node)
 {
-    if (node->op().type() == TokenType::PLUS_OP)
+    if (node->op().type() == TokenType::PLUS)
         return +visitNode(node->expr());
     else
         return -visitNode(node->expr());
@@ -46,23 +46,23 @@ double Interpretor::visitNodeBinOp(BinOp *node)
 {
     switch (node->op().type())
     {
-    case TokenType::PLUS_OP:
+    case TokenType::PLUS:
         return visitNode(node->left()) + visitNode(node->right());
         break;
 
-    case TokenType::MINUS_OP:
+    case TokenType::MINUS:
         return visitNode(node->left()) - visitNode(node->right());
         break;
 
-    case TokenType::MULT_OP:
+    case TokenType::MULT:
         return visitNode(node->left()) * visitNode(node->right());
         break;
 
-    case TokenType::DIV_OP:
+    case TokenType::DIV:
         return visitNode(node->left()) / visitNode(node->right());
         break;
 
-    case TokenType::MOD_OP:
+    case TokenType::MOD:
         return (int)visitNode(node->left()) % (int)visitNode(node->right());
         break;
 
