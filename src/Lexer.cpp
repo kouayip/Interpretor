@@ -157,9 +157,26 @@ const Token Lexer::getNextToken() //? Update laster
         case ')':
             advance();
             return Token{TokenType::RPAREN, ')', lt};
+        case '{':
+            advance();
+            return Token{TokenType::LCURLY, '{', lt};
+        case '}':
+            advance();
+            return Token{TokenType::RCURLY, '}', lt};
         case ';':
             advance();
             return Token{TokenType::SEMI, ';', lt};
+        case ',':
+            advance();
+            return Token{TokenType::COMMA, ',', lt};
+        case '<':
+            advance();
+            if (currentChar_ == '-')
+                return Token{TokenType::LASSIGN, "<-", lt};
+            return Token{TokenType::LTHAN, '<', lt};
+        case '>':
+            advance();
+            return Token{TokenType::GTHAN, '>', lt};
         default:
             throwError();
             break;

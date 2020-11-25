@@ -24,6 +24,7 @@ enum TokenType
     LCURLY, // <{>
     RCURLY, // <}>
     COLON,  // <:>
+    COMMA,  // <,>
     SEMI,   // <;>
     DOT,    // <.>
 
@@ -55,12 +56,70 @@ enum TokenType
     _EOF_, //* end of input
 };
 
+//! Helper print token type
 inline std::ostream &operator<<(std::ostream &op, TokenType type)
 {
     switch (type)
     {
     case TokenType::ID:
         op << "ID";
+        break;
+    case TokenType::INUM:
+        op << "INUM";
+        break;
+    case TokenType::FNUM:
+        op << "FNUM";
+        break;
+    case TokenType::STRING:
+        op << "STRING";
+        break;
+    case TokenType::PLUS:
+        op << "PLUS";
+        break;
+    case TokenType::MINUS:
+        op << "MINUS";
+        break;
+    case TokenType::MULT:
+        op << "MULT";
+        break;
+    case TokenType::DIV:
+        op << "DIV";
+        break;
+    case TokenType::LPAREN:
+        op << "LPAREN";
+        break;
+    case TokenType::RPAREN:
+        op << "RPAREN";
+        break;
+    case TokenType::LCURLY:
+        op << "LCURLY";
+        break;
+    case TokenType::RCURLY:
+        op << "RCURLY";
+        break;
+    case TokenType::COMMA:
+        op << "COMMA";
+        break;
+    case TokenType::SEMI:
+        op << "SEMI";
+        break;
+    case TokenType::LTHAN:
+        op << "LTHAN";
+        break;
+    case TokenType::GTHAN:
+        op << "GTHAN";
+        break;
+    case TokenType::LASSIGN:
+        op << "LASSIGN";
+        break;
+    case TokenType::VAL:
+        op << "VAL";
+        break;
+    case TokenType::CONST:
+        op << "CONST";
+        break;
+    case TokenType::PRINT:
+        op << "PRINT";
         break;
     case TokenType::_EOF_:
         op << "EOF";

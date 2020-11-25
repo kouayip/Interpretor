@@ -16,7 +16,7 @@ private:
     int col_;                //? Current col to cursor in buffor
     char currentChar_;       //? Is a current char of cursor to a buffer
     std::map<std::string, TokenType> keywords_ = {
-        {"const", TokenType::VAL},
+        {"const", TokenType::CONST},
         {"val", TokenType::VAL},
     }; //? Is Defaut reserve keywords
 

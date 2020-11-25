@@ -29,7 +29,7 @@ int main()
     {
         //? 7 + (((3 + 2))) = 12
         //? 5 - - - + - (3 + 4) - +2 = 10
-        auto source{"((\n    const<int>\n{ x <- 10 + 9,\n y <- 3,};\n))\n"}; // 10
+        auto source{"((\n    const<int>\n{ x <- 10.8 + 9,\n y <- 3,};\n))\n"}; // 10
 
         //? Test Lexer
         Lexer lex{source};
