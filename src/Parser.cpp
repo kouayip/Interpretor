@@ -35,7 +35,7 @@ Node *Parser::program()
     consume(TokenType::LPAREN);
     consume(TokenType::LPAREN);
 
-    auto const root = new Program{"Test", block()};
+    auto root = new Program{"Test", block()};
 
     //? Consume a declaration end program
     consume(TokenType::RPAREN);
@@ -107,7 +107,6 @@ Node *Parser::varDeclaration(Node *&type)
     auto const nodes = new CompoundDecl{};
     auto prevVarPosLine = -1; //? Save last position line the prev var
     auto index = -1;          //? index frist multy declaration
-    auto cpt = 0;             //? number of declarations
     auto isMulDecl = false;   // Check is si Multy declaration or unique declaration
     auto isAssign = false;
     while (currentToken_.type() == TokenType::ID)
@@ -143,7 +142,7 @@ Node *Parser::varDeclaration(Node *&type)
                 const auto op = currentToken_;
                 consume(TokenType::LASSIGN);
                 auto mAssign = new MultAssign{op, expr()};
-                auto size = nodes->children.size();
+                auto size = nodes->children.size() - 1;
                 for (size_t i = index; i < size; i++)
                 {
                     Utils::print(i);

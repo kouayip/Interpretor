@@ -37,7 +37,7 @@ int main()
         auto source{"((\n"
                     "val<int>\n{\n"
                     "x <- 3,\n"
-                    "y,z <- 10.8 + 9,\n"
+                    "y,z <- 10.8 + 9 / 7 + (((3 + 2))),\n"
                     "t <- 5 - - - + - (3 + 4) - +2"
                     "};\n"
                     "))\n"}; // 10
@@ -62,6 +62,7 @@ int main()
         auto inter = Interpretor{};
 
         ast->printNode();
+        ast->free();
 
         // inter.interpret(ast);
 

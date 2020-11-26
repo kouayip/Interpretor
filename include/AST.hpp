@@ -34,7 +34,12 @@ struct Node
 
     virtual std::string print() = 0;
 
+    /**
+     * Print Node for genered a AST Tree view
+     */
     virtual void printNode(std::string space = "", std::string prefix = "") const = 0;
+
+    virtual void free() = 0;
 
     /**
      * Use to reveal real Node class
@@ -74,6 +79,11 @@ struct Num : Node
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "Num<" << token_.value() << ">" << std::endl;
+    }
+
+    virtual void free()
+    {
+        std::cout << "(-)Num" << std::endl;
     }
 
     /**
@@ -133,6 +143,17 @@ struct BinOp : Node
         right_->printNode(space + "│    ", "├── ");
     }
 
+    virtual void free()
+    {
+        std::cout << "(-)BinOp" << std::endl;
+        left_->free();
+        right_->free();
+        delete left_;
+        delete right_;
+        left_ = nullptr;
+        right_ = nullptr;
+    }
+
 private:
     Node *left_;
     Token op_;
@@ -167,6 +188,14 @@ struct UnaryOp : Node
         expr_->printNode(space + "│    ", "├── ");
     }
 
+    virtual void free()
+    {
+        std::cout << "(-)Unary" << std::endl;
+        expr_->free();
+        delete expr_;
+        expr_ = nullptr;
+    }
+
 private:
     Token op_;
     Node *expr_;
@@ -183,9 +212,6 @@ struct Block : Node
         return "Block";
     }
 
-    //├──
-    //└──
-    //│
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "Block" << std::endl;
@@ -193,6 +219,18 @@ struct Block : Node
         {
             children[i]->printNode(space + "│    ", "├── ");
         }
+    }
+
+    virtual void free()
+    {
+        std::cout << "(-)Block" << std::endl;
+        for (size_t i = 0; i < children.size(); i++)
+        {
+            children[i]->free();
+            delete children[i];
+            children[i] = nullptr;
+        }
+        children.clear();
     }
 
     std::vector<Node *> children;
@@ -226,6 +264,14 @@ struct Program : Node
     {
         std::cout << "Program" << std::endl;
         block_->printNode(space, "├── ");
+    }
+
+    virtual void free()
+    {
+        std::cout << "(-)Program" << std::endl;
+        block_->free();
+        delete block_;
+        block_ = nullptr;
     }
 
     std::string name() const
@@ -273,6 +319,19 @@ struct Assign : Node
         std::cout << space << prefix << "Assign" << std::endl;
         left_->printNode(space + "│    ", "├── ");
         right_->printNode(space + "│    ", "├── ");
+    }
+
+    virtual void free()
+    {
+        std::cout << "(-)Assign" << std::endl;
+        left_->free();
+        right_->free();
+
+        delete left_;
+        left_ = nullptr;
+
+        delete right_;
+        right_ = nullptr;
     }
 
     /**
@@ -337,6 +396,21 @@ struct MultAssign : Node
         right_->printNode(space + "│    ", "├── ");
     }
 
+    virtual void free()
+    {
+        std::cout << "(-)MultAssign" << std::endl;
+        for (size_t i = 0; i < left_.size(); i++)
+        {
+            left_[i]->free();
+            delete left_[i];
+            left_[i] = nullptr;
+        }
+        left_.clear();
+        right_->free();
+        delete right_;
+        right_ = nullptr;
+    }
+
     /**
      * @return Token
      */
@@ -392,6 +466,11 @@ struct Var : Node
         std::cout << space << prefix << "Var<" << token_.value() << ">" << std::endl;
     }
 
+    virtual void free()
+    {
+        std::cout << "(-)Var" << std::endl;
+    }
+
     // ? Return name of variable
     /**
      * @return string
@@ -442,6 +521,11 @@ struct VarType : Node
         std::cout << space << prefix << "VarType<" << token_.value() << ">" << std::endl;
     }
 
+    virtual void free()
+    {
+        std::cout << "(-)VarType" << std::endl;
+    }
+
 private:
     Token token_;
 };
@@ -471,6 +555,15 @@ struct VarDecl : Node
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << prefix << "VarDecl" << std::endl;
+    }
+
+    virtual void free()
+    {
+        delete type_;
+        type_ = nullptr;
+
+        delete var_;
+        var_ = nullptr;
     }
 
     virtual Node *var() const
@@ -511,6 +604,17 @@ struct ConstDecl : VarDecl
     {
         std::cout << prefix << "ConstDecl" << std::endl;
     }
+
+    virtual void free()
+    {
+        // type_->free();
+        delete type_;
+        type_ = nullptr;
+
+        // var_->free();
+        delete var_;
+        var_ = nullptr;
+    }
 };
 
 /**
@@ -539,6 +643,26 @@ struct ValDecl : VarDecl
         var_->printNode(space + "│    ", "├── ");
         type_->printNode(space + "│    ", "└── ");
     }
+
+    virtual void free()
+    {
+        std::cout << "++ValDecl" << std::endl;
+        type_->free();
+        var_->free();
+
+        // delete type_;
+        // delete var_;
+        // type_ = nullptr;
+        // var_ = nullptr;
+    }
+
+    ~ValDecl()
+    {
+        delete type_;
+        delete var_;
+        type_ = nullptr;
+        var_ = nullptr;
+    }
 };
 
 /**
@@ -561,6 +685,18 @@ struct CompoundDecl : Node
         {
             children[i]->printNode(space + "│    ", "├── ");
         }
+    }
+
+    virtual void free()
+    {
+        std::cout << "(-)CompoundDecl" << std::endl;
+        for (size_t i = 0; i < children.size(); i++)
+        {
+            children[i]->free();
+            delete children[i];
+            children[i] = nullptr;
+        }
+        children.clear();
     }
 
     std::vector<Node *> children;
