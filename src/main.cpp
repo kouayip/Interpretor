@@ -38,7 +38,7 @@ int main()
                     "val<int>\n{\n"
                     "x <- 3,\n"
                     "y,z <- 10.8 + 9,\n"
-                    "t"
+                    "t <- 5 - - - + - (3 + 4) - +2"
                     "};\n"
                     "))\n"}; // 10
 
@@ -61,7 +61,9 @@ int main()
 
         auto inter = Interpretor{};
 
-        inter.interpret(ast);
+        ast->printNode();
+
+        // inter.interpret(ast);
 
         // remove(ast);
         // inter.clearRes();

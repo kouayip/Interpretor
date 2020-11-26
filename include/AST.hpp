@@ -34,6 +34,8 @@ struct Node
 
     virtual std::string print() = 0;
 
+    virtual void printNode(std::string space = "", std::string prefix = "") const = 0;
+
     /**
      * Use to reveal real Node class
      */
@@ -67,6 +69,11 @@ struct Num : Node
     {
         std::cout << value_ << std::endl;
         return "Num";
+    }
+
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "Num<" << token_.value() << ">" << std::endl;
     }
 
     /**
@@ -119,6 +126,13 @@ struct BinOp : Node
         return "BinOp";
     }
 
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "BinOp<" << op_.value() << ">" << std::endl;
+        left_->printNode(space + "│    ", "├── ");
+        right_->printNode(space + "│    ", "├── ");
+    }
+
 private:
     Node *left_;
     Token op_;
@@ -147,6 +161,12 @@ struct UnaryOp : Node
         return "Unary";
     }
 
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "Unary<" << op_.value() << ">" << std::endl;
+        expr_->printNode(space + "│    ", "├── ");
+    }
+
 private:
     Token op_;
     Node *expr_;
@@ -161,6 +181,18 @@ struct Block : Node
     virtual std::string print()
     {
         return "Block";
+    }
+
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "Block" << std::endl;
+        for (size_t i = 0; i < children.size(); i++)
+        {
+            children[i]->printNode(space + "│    ", "├── ");
+        }
     }
 
     std::vector<Node *> children;
@@ -183,13 +215,17 @@ struct Program : Node
      * @param name string
      * @param block Compound
      */
-    Program(std::string const(&name), Node *block) : Node(NodeType::PROGRAM)
-    {
-    }
+    Program(std::string const(&name), Node *block) : block_(block), Node(NodeType::PROGRAM) {}
 
     virtual std::string print()
     {
         return "Program";
+    }
+
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << "Program" << std::endl;
+        block_->printNode(space, "├── ");
     }
 
     std::string name() const
@@ -227,6 +263,16 @@ struct Assign : Node
     virtual std::string print()
     {
         return "Assign";
+    }
+
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "Assign" << std::endl;
+        left_->printNode(space + "│    ", "├── ");
+        right_->printNode(space + "│    ", "├── ");
     }
 
     /**
@@ -278,6 +324,19 @@ struct MultAssign : Node
         return "Assign";
     }
 
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "MultAssign" << std::endl;
+        for (size_t i = 0; i < left_.size(); i++)
+        {
+            left_[i]->printNode(space + "│    ", "├── ");
+        }
+        right_->printNode(space + "│    ", "├── ");
+    }
+
     /**
      * @return Token
      */
@@ -325,6 +384,14 @@ struct Var : Node
         return "Var";
     }
 
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "Var<" << token_.value() << ">" << std::endl;
+    }
+
     // ? Return name of variable
     /**
      * @return string
@@ -367,6 +434,14 @@ struct VarType : Node
         return "VarDecl";
     }
 
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "VarType<" << token_.value() << ">" << std::endl;
+    }
+
 private:
     Token token_;
 };
@@ -388,6 +463,14 @@ struct VarDecl : Node
     virtual std::string print()
     {
         return "VarDecl";
+    }
+
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << prefix << "VarDecl" << std::endl;
     }
 
     virtual Node *var() const
@@ -420,6 +503,14 @@ struct ConstDecl : VarDecl
     {
         return "VarDecl";
     }
+
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << prefix << "ConstDecl" << std::endl;
+    }
 };
 
 /**
@@ -438,6 +529,16 @@ struct ValDecl : VarDecl
     {
         return "AutoDecl";
     }
+
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "ValDecl" << std::endl;
+        var_->printNode(space + "│    ", "├── ");
+        type_->printNode(space + "│    ", "└── ");
+    }
 };
 
 /**
@@ -448,6 +549,18 @@ struct CompoundDecl : Node
     virtual std::string print()
     {
         return "Block";
+    }
+
+    //├──
+    //└──
+    //│
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "CompoundDecl" << std::endl;
+        for (size_t i = 0; i < children.size(); i++)
+        {
+            children[i]->printNode(space + "│    ", "├── ");
+        }
     }
 
     std::vector<Node *> children;
