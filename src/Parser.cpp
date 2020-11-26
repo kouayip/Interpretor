@@ -47,21 +47,23 @@ Node *Parser::program()
 
 Node *Parser::block()
 {
-    auto const block = new Block{};
+    auto const block = new Block;
 
     //? Complete list of block {If statment ...}
     if (currentToken_.type() == TokenType::VAL ||
         currentToken_.type() == TokenType::CONST)
     {
-        block->children.push_back(declarations());
+        auto decl = declarations();
+        block->append(decl);
     }
     else if (currentToken_.type() == TokenType::ID)
     {
-        block->children.push_back(assignStatement());
+        auto assign = assignStatement();
+        block->append(assign);
     }
     else
     {
-        throw error(); //! Change to empty block
+        block->append(new Empty());
     }
 
     return block;
@@ -74,6 +76,7 @@ Node *Parser::declarations()
         consume(TokenType::VAL);
         auto type = typeSpec();
         auto decs = varDeclaration<ValDecl>(type);
+
         consume(TokenType::SEMI);
         return decs;
     }
@@ -89,17 +92,25 @@ Node *Parser::declarations()
     throw error();
 }
 
-template <typename T, class VarDecl>
-Node *Parser::varDeclaration(Node *&type)
+template <typename T>
+Node *Parser::varDeclaration(Node *(&type))
 {
     if (currentToken_.type() == TokenType::LCURLY)
     {
         consume(TokenType::LCURLY);
         if (currentToken_.type() == TokenType::ID)
         {
-            Node *nodes = varDeclaration<T>(type);
+            auto nodes = varDeclaration<T>(type);
+
             consume(TokenType::RCURLY);
             return nodes;
+        }
+        else if (currentToken_.type() == TokenType::RCURLY)
+        {
+            consume(TokenType::RCURLY);
+            delete type; //? Free resource type to declaration is empty
+            type = nullptr;
+            return new Empty{};
         }
         throw error();
     }
@@ -120,11 +131,11 @@ Node *Parser::varDeclaration(Node *&type)
         else if (isMulDecl)
         {
             isMulDecl = false;
-            index = nodes->children.size();
+            index = nodes->size();
         }
         else if (isAssign)
         {
-            index = nodes->children.size();
+            index = nodes->size();
         }
         else
         {
@@ -133,7 +144,7 @@ Node *Parser::varDeclaration(Node *&type)
 
         auto var = variable();
 
-        nodes->children.push_back(new ValDecl{var, type});
+        nodes->append(new ValDecl{var, type});
 
         if (isAssign = (currentToken_.type() == TokenType::LASSIGN))
         {
@@ -142,20 +153,20 @@ Node *Parser::varDeclaration(Node *&type)
                 const auto op = currentToken_;
                 consume(TokenType::LASSIGN);
                 auto mAssign = new MultAssign{op, expr()};
-                auto size = nodes->children.size() - 1;
+                auto size = nodes->size() - 1;
                 for (size_t i = index; i < size; i++)
                 {
                     Utils::print(i);
-                    mAssign->pushVar(nodes->children[i]->reveal<ValDecl *>()->var());
+                    mAssign->append((*nodes)[i]->reveal<ValDecl *>()->var());
                 }
 
-                mAssign->pushVar(var);
+                mAssign->append(var); //? a last var multy line
 
-                nodes->children.push_back(mAssign);
+                nodes->append(mAssign);
             }
             else
             {
-                nodes->children.push_back(assignStatement(var));
+                nodes->append(assignStatement(var));
             }
         }
 

@@ -34,7 +34,7 @@ private:
     /**
      * Declaration val 
      */
-    template <typename T, typename = std::enable_if<std::is_base_of<VarDecl, T>::value>>
+    template <typename T>
     Node *varDeclaration(Node *&type);
 
     /**

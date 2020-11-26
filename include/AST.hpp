@@ -13,24 +13,33 @@ enum NodeType
     BINOP,
     UNARYOP,
     PROGRAM,
+    BLOCK,
     VAR,
     VARDECL,
     CONSTDECL,
-    AUTODECL,
+    VALDECL,
     VARTYPE,
     DECL,
     ASSIGN,
     MULTASSIGN,
+    COMPOUNDDECL,
+    EMPTY,
 };
 
 /**
  * AST node
  */
-struct Node
+class Node
 {
+public:
     Node() : type_(NodeType::AST) {}
 
     Node(NodeType const(&type)) : type_(type) {}
+
+    ~Node()
+    {
+        std::cout << "(-) Node" << std::endl;
+    }
 
     virtual std::string print() = 0;
 
@@ -38,8 +47,6 @@ struct Node
      * Print Node for genered a AST Tree view
      */
     virtual void printNode(std::string space = "", std::string prefix = "") const = 0;
-
-    virtual void free() = 0;
 
     /**
      * Use to reveal real Node class
@@ -59,15 +66,40 @@ protected:
     NodeType type_;
 };
 
+class Empty : public Node
+{
+public:
+    Empty()
+    {
+        type_ = NodeType::EMPTY;
+    }
+
+    virtual std::string print()
+    {
+        return "Empty Node";
+    }
+
+    virtual void printNode(std::string space, std::string prefix) const
+    {
+        std::cout << space << prefix << "Empty" << std::endl;
+    }
+};
+
 /**
  * Num node
  * ? Is a node content number
  */
-struct Num : Node
+class Num : public Node
 {
+public:
     Num(Token const(&token)) : token_(token), Node(NodeType::NUM)
     {
         value_ = std::stod(token.value());
+    }
+
+    ~Num()
+    {
+        std::cout << "(-) Num" << std::endl;
     }
 
     virtual std::string print()
@@ -79,11 +111,6 @@ struct Num : Node
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "Num<" << token_.value() << ">" << std::endl;
-    }
-
-    virtual void free()
-    {
-        std::cout << "(-)Num" << std::endl;
     }
 
     /**
@@ -112,9 +139,18 @@ private:
 /**
  * Binary operator
  */
-struct BinOp : Node
+class BinOp : public Node
 {
-    BinOp(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::BINOP) {}
+public:
+    BinOp(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right)
+    {
+        type_ = NodeType::BINOP;
+    }
+
+    ~BinOp()
+    {
+        std::cout << "(-) BinOp" << std::endl;
+    }
 
     const auto op() const
     {
@@ -143,17 +179,6 @@ struct BinOp : Node
         right_->printNode(space + "│    ", "├── ");
     }
 
-    virtual void free()
-    {
-        std::cout << "(-)BinOp" << std::endl;
-        left_->free();
-        right_->free();
-        delete left_;
-        delete right_;
-        left_ = nullptr;
-        right_ = nullptr;
-    }
-
 private:
     Node *left_;
     Token op_;
@@ -163,9 +188,18 @@ private:
 /**
  * Unary operator
  */
-struct UnaryOp : Node
+class UnaryOp : public Node
 {
-    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr), Node(NodeType::UNARYOP) {}
+public:
+    UnaryOp(Token const(&token), Node *expr) : op_(token), expr_(expr)
+    {
+        type_ = NodeType::UNARYOP;
+    }
+
+    ~UnaryOp()
+    {
+        std::cout << "(-) UnaryOp" << std::endl;
+    }
 
     const auto op() const
     {
@@ -188,14 +222,6 @@ struct UnaryOp : Node
         expr_->printNode(space + "│    ", "├── ");
     }
 
-    virtual void free()
-    {
-        std::cout << "(-)Unary" << std::endl;
-        expr_->free();
-        delete expr_;
-        expr_ = nullptr;
-    }
-
 private:
     Token op_;
     Node *expr_;
@@ -205,55 +231,95 @@ private:
  * Compound instructions
  * Represents an instruction group
  */
-struct Block : Node
+class Block : public Node
 {
-    virtual std::string print()
+private:
+    std::vector<Node *> children_;
+
+public:
+    Block()
     {
-        return "Block";
+        this->type_ = NodeType::BLOCK;
+    }
+
+    Block(std::vector<Node *> children) : children_(children)
+    {
+        this->type_ = NodeType::BLOCK;
+    }
+
+    ~Block()
+    {
+        std::cout << "(-) Block" << std::endl;
+        // for (size_t i = 0; i < children_.size(); i++)
+        // {
+        //     delete children_[i];
+        //     children_[i] = nullptr;
+        // }
+
+        children_.clear();
+    }
+
+    void append(Node *const &child)
+    {
+        children_.push_back(child);
+    }
+
+    inline Node *operator[](std::size_t idx) noexcept
+    {
+        return children_[idx];
+    }
+
+    const int size() noexcept
+    {
+        return children_.size();
     }
 
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "Block" << std::endl;
-        for (size_t i = 0; i < children.size(); i++)
+        for (size_t i = 0; i < children_.size(); i++)
         {
-            children[i]->printNode(space + "│    ", "├── ");
+            children_[i]->printNode(space + "│    ", "├── ");
         }
     }
 
-    virtual void free()
+    virtual std::string print()
     {
-        std::cout << "(-)Block" << std::endl;
-        for (size_t i = 0; i < children.size(); i++)
-        {
-            children[i]->free();
-            delete children[i];
-            children[i] = nullptr;
-        }
-        children.clear();
+        return "Block";
     }
-
-    std::vector<Node *> children;
 };
 
 /**
  * Compound instructions
  * Represents an instruction group
  */
-struct CompoundBlock : Node
+class CompoundBlock : public Node
 {
 };
 
 /**
  * Program root
  */
-struct Program : Node
+class Program : public Node
 {
+private:
+    std::string name_;
+    Node *block_;
+
+public:
     /**
      * @param name string
      * @param block Compound
      */
-    Program(std::string const(&name), Node *block) : block_(block), Node(NodeType::PROGRAM) {}
+    Program(std::string const(&name), Node *const &block) : block_(block)
+    {
+        type_ = NodeType::PROGRAM;
+    }
+
+    ~Program()
+    {
+        std::cout << "(-) Program" << std::endl;
+    }
 
     virtual std::string print()
     {
@@ -266,15 +332,7 @@ struct Program : Node
         block_->printNode(space, "├── ");
     }
 
-    virtual void free()
-    {
-        std::cout << "(-)Program" << std::endl;
-        block_->free();
-        delete block_;
-        block_ = nullptr;
-    }
-
-    std::string name() const
+    std::string name() noexcept
     {
         return name_;
     }
@@ -282,28 +340,31 @@ struct Program : Node
     /**
      * @return Compound
      */
-    Node *block() const
+    const auto block() noexcept
     {
         return block_;
     }
-
-private:
-    std::string name_;
-    Node *block_;
 };
 
 /**
  * Assign assignment
  */
-struct Assign : Node
+class Assign : public Node
 {
+public:
     /**
      * @param left Var
      * @param op Token
      * @param right BinOp
      */
-    Assign(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right), Node(NodeType::ASSIGN)
+    Assign(Node *left, Token const(&op), Node *right) : left_(left), op_(op), right_(right)
     {
+        type_ = NodeType::ASSIGN;
+    }
+
+    ~Assign()
+    {
+        std::cout << "(-) Assign" << std::endl;
     }
 
     virtual std::string print()
@@ -319,19 +380,6 @@ struct Assign : Node
         std::cout << space << prefix << "Assign" << std::endl;
         left_->printNode(space + "│    ", "├── ");
         right_->printNode(space + "│    ", "├── ");
-    }
-
-    virtual void free()
-    {
-        std::cout << "(-)Assign" << std::endl;
-        left_->free();
-        right_->free();
-
-        delete left_;
-        left_ = nullptr;
-
-        delete right_;
-        right_ = nullptr;
     }
 
     /**
@@ -367,15 +415,48 @@ private:
 /**
  * Multiple Assign assignment
  */
-struct MultAssign : Node
+class MultAssign : public Node
 {
+private:
+    std::vector<Node *> left_;
+    Token op_;
+    Node *right_;
+
+public:
     /**
      * @param left Vector
      * @param op Token
      * @param right BinOp
      */
-    MultAssign(Token const(&op), Node *right) : op_(op), right_(right), Node(NodeType::MULTASSIGN)
+    MultAssign(Token const(&op), Node *right) : op_(op), right_(right)
     {
+        type_ = NodeType::MULTASSIGN;
+    }
+
+    MultAssign(std::vector<Node *> left, Token const(&op), Node *right) : left_(left), op_(op), right_(right)
+    {
+        type_ = NodeType::MULTASSIGN;
+    }
+
+    ~MultAssign()
+    {
+        std::cout << "(-) MultAssign" << std::endl;
+        left_.clear();
+    }
+
+    void append(Node *const &child)
+    {
+        left_.push_back(child);
+    }
+
+    inline Node *operator[](std::size_t idx) noexcept
+    {
+        return left_[idx];
+    }
+
+    const int size() noexcept
+    {
+        return left_.size();
     }
 
     virtual std::string print()
@@ -383,9 +464,6 @@ struct MultAssign : Node
         return "Assign";
     }
 
-    //├──
-    //└──
-    //│
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "MultAssign" << std::endl;
@@ -394,21 +472,6 @@ struct MultAssign : Node
             left_[i]->printNode(space + "│    ", "├── ");
         }
         right_->printNode(space + "│    ", "├── ");
-    }
-
-    virtual void free()
-    {
-        std::cout << "(-)MultAssign" << std::endl;
-        for (size_t i = 0; i < left_.size(); i++)
-        {
-            left_[i]->free();
-            delete left_[i];
-            left_[i] = nullptr;
-        }
-        left_.clear();
-        right_->free();
-        delete right_;
-        right_ = nullptr;
     }
 
     /**
@@ -420,11 +483,11 @@ struct MultAssign : Node
     }
 
     /**
-     * @return Var
+     * @return Token
      */
-    const auto pushVar(Node *const(&node))
+    auto left() const
     {
-        return left_.push_back(node);
+        return left_;
     }
 
     /**
@@ -434,23 +497,28 @@ struct MultAssign : Node
     {
         return right_;
     }
-
-private:
-    std::vector<Node *> left_;
-    Token op_;
-    Node *right_;
 };
 
 /**
  * Variable {val<type> and const<type>}
  */
-struct Var : Node
+class Var : public Node
 {
+private:
+    Token token_;
+
+public:
     /**
      * @param token Token
      */
-    Var(Token const(&token)) : token_(token), Node(NodeType::VAR)
+    Var(Token const(&token)) : token_(token)
     {
+        type_ = NodeType::VAR;
+    }
+
+    ~Var()
+    {
+        std::cout << "(-) Var" << std::endl;
     }
 
     virtual std::string print()
@@ -458,17 +526,9 @@ struct Var : Node
         return "Var";
     }
 
-    //├──
-    //└──
-    //│
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "Var<" << token_.value() << ">" << std::endl;
-    }
-
-    virtual void free()
-    {
-        std::cout << "(-)Var" << std::endl;
     }
 
     // ? Return name of variable
@@ -487,17 +547,23 @@ struct Var : Node
     {
         return token_;
     }
-
-private:
-    Token token_;
 };
 
-struct VarType : Node
+class VarType : public Node
 {
+public:
     /**
      * @param token Token
      */
-    VarType(Token const(&token)) : token_(token), Node(NodeType::VARTYPE) {}
+    VarType(Token const(&token)) : token_(token)
+    {
+        type_ = NodeType::VARTYPE;
+    }
+
+    ~VarType()
+    {
+        std::cout << "(-) VarType" << std::endl;
+    }
 
     // ? Return type of variable
     /**
@@ -508,9 +574,14 @@ struct VarType : Node
         return token_.value();
     }
 
+    const auto token()
+    {
+        return token_;
+    }
+
     virtual std::string print()
     {
-        return "VarDecl";
+        return "VarType";
     }
 
     //├──
@@ -521,11 +592,6 @@ struct VarType : Node
         std::cout << space << prefix << "VarType<" << token_.value() << ">" << std::endl;
     }
 
-    virtual void free()
-    {
-        std::cout << "(-)VarType" << std::endl;
-    }
-
 private:
     Token token_;
 };
@@ -534,7 +600,7 @@ private:
  * Variable Declaration <type>{x <- number,}
  * And define a type of variable
  */
-struct VarDecl : Node
+class VarDecl : public Node
 {
     /**
      * @param var VarType
@@ -549,21 +615,9 @@ struct VarDecl : Node
         return "VarDecl";
     }
 
-    //├──
-    //└──
-    //│
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << prefix << "VarDecl" << std::endl;
-    }
-
-    virtual void free()
-    {
-        delete type_;
-        type_ = nullptr;
-
-        delete var_;
-        var_ = nullptr;
     }
 
     virtual Node *var() const
@@ -584,59 +638,73 @@ protected:
 /**
  * Constant variable Declaration
  */
-struct ConstDecl : VarDecl
+class ConstDecl : public Node
 {
+public:
     /**
      * @param var VarType
      * @param type Var
      */
-    ConstDecl(Node *var, Node *type) : VarDecl(var, type, NodeType::CONSTDECL) {}
+    ConstDecl(Node *var, Node *type) : var_(var), type_(type)
+    {
+        Node::type_ = NodeType::CONSTDECL;
+    }
 
     virtual std::string print()
     {
-        return "VarDecl";
+        return "ConstDecl";
     }
 
-    //├──
-    //└──
-    //│
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << prefix << "ConstDecl" << std::endl;
     }
 
-    virtual void free()
+    auto *var() const
     {
-        // type_->free();
-        delete type_;
-        type_ = nullptr;
-
-        // var_->free();
-        delete var_;
-        var_ = nullptr;
+        return this->var_;
     }
+
+    auto *type() const
+    {
+        return this->type_;
+    }
+
+private:
+    Node *var_;
+    Node *type_;
 };
 
 /**
  * Value variable Declaration
  * Resove type of var afta affectation
  */
-struct ValDecl : VarDecl
+class ValDecl : public Node
 {
+private:
+    Node *var_;
+    Node *type_;
+
+public:
     /**
      * @param var VarType
      * @param type Var
      */
-    ValDecl(Node *var, Node *type) : VarDecl(var, type, NodeType::AUTODECL) {}
+    ValDecl(Node *var, Node *type) : var_(var), type_(type)
+    {
+        Node::type_ = NodeType::VALDECL;
+    }
+
+    ~ValDecl()
+    {
+        std::cout << "(-) ValDecl" << std::endl;
+    }
 
     virtual std::string print()
     {
         return "AutoDecl";
     }
 
-    //├──
-    //└──
-    //│
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "ValDecl" << std::endl;
@@ -644,74 +712,70 @@ struct ValDecl : VarDecl
         type_->printNode(space + "│    ", "└── ");
     }
 
-    virtual void free()
+    const auto var() noexcept
     {
-        std::cout << "++ValDecl" << std::endl;
-        type_->free();
-        var_->free();
-
-        // delete type_;
-        // delete var_;
-        // type_ = nullptr;
-        // var_ = nullptr;
+        return this->var_;
     }
 
-    ~ValDecl()
+    const auto type() noexcept
     {
-        delete type_;
-        delete var_;
-        type_ = nullptr;
-        var_ = nullptr;
+        return this->type_;
     }
 };
 
 /**
  * Compound Declaration or Assignement;
  */
-struct CompoundDecl : Node
+class CompoundDecl : public Node
 {
-    virtual std::string print()
+public:
+    CompoundDecl()
     {
-        return "Block";
+        type_ = NodeType::COMPOUNDDECL;
     }
 
-    //├──
-    //└──
-    //│
+    CompoundDecl(std::vector<Node *> children) : children_(children)
+    {
+        this->type_ = NodeType::COMPOUNDDECL;
+    }
+
+    ~CompoundDecl()
+    {
+        std::cout << "(-) CompoundDecl" << std::endl;
+        children_.clear();
+    }
+
+    void append(Node *const &child)
+    {
+        children_.push_back(child);
+    }
+
+    inline Node *operator[](std::size_t idx) noexcept
+    {
+        return children_[idx];
+    }
+
+    const int size() noexcept
+    {
+        return children_.size();
+    }
+
+    virtual std::string print()
+    {
+        return "CompoundDecl";
+    }
+
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
         std::cout << space << prefix << "CompoundDecl" << std::endl;
-        for (size_t i = 0; i < children.size(); i++)
+        for (size_t i = 0; i < children_.size(); i++)
         {
-            children[i]->printNode(space + "│    ", "├── ");
+            children_[i]->printNode(space + "│    ", "├── ");
         }
     }
 
-    virtual void free()
-    {
-        std::cout << "(-)CompoundDecl" << std::endl;
-        for (size_t i = 0; i < children.size(); i++)
-        {
-            children[i]->free();
-            delete children[i];
-            children[i] = nullptr;
-        }
-        children.clear();
-    }
-
-    std::vector<Node *> children;
+private:
+    std::vector<Node *> children_;
 };
-
-//├──
-//└──
-//│
-inline void
-printTree(Node *node, const std::string &prefix)
-{
-    if (node == nullptr)
-    {
-        return;
-    }
-}
 
 #endif
