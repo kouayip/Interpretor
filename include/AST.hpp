@@ -38,7 +38,7 @@ public:
 
     ~Node()
     {
-        std::cout << "(-) Node" << std::endl;
+        // std::cout << "(-) Node" << std::endl;
     }
 
     virtual std::string print() = 0;
@@ -81,13 +81,13 @@ public:
 
     virtual void printNode(std::string space, std::string prefix) const
     {
-        std::cout << space << prefix << "Empty" << std::endl;
+        std::cout << space << "└── "
+                  << "Empty" << std::endl;
     }
 };
 
 /**
  * Num node
- * ? Is a node content number
  */
 class Num : public Node
 {
@@ -99,7 +99,7 @@ public:
 
     ~Num()
     {
-        std::cout << "(-) Num" << std::endl;
+        // std::cout << "(-) Num" << std::endl;
     }
 
     virtual std::string print()
@@ -149,7 +149,7 @@ public:
 
     ~BinOp()
     {
-        std::cout << "(-) BinOp" << std::endl;
+        // std::cout << "(-) BinOp" << std::endl;
     }
 
     const auto op() const
@@ -198,7 +198,7 @@ public:
 
     ~UnaryOp()
     {
-        std::cout << "(-) UnaryOp" << std::endl;
+        // std::cout << "(-) UnaryOp" << std::endl;
     }
 
     const auto op() const
@@ -249,7 +249,7 @@ public:
 
     ~Block()
     {
-        std::cout << "(-) Block" << std::endl;
+        // std::cout << "(-) Block" << std::endl;
         // for (size_t i = 0; i < children_.size(); i++)
         // {
         //     delete children_[i];
@@ -318,7 +318,7 @@ public:
 
     ~Program()
     {
-        std::cout << "(-) Program" << std::endl;
+        // std::cout << "(-) Program" << std::endl;
     }
 
     virtual std::string print()
@@ -364,7 +364,7 @@ public:
 
     ~Assign()
     {
-        std::cout << "(-) Assign" << std::endl;
+        // std::cout << "(-) Assign" << std::endl;
     }
 
     virtual std::string print()
@@ -440,7 +440,7 @@ public:
 
     ~MultAssign()
     {
-        std::cout << "(-) MultAssign" << std::endl;
+        // std::cout << "(-) MultAssign" << std::endl;
         left_.clear();
     }
 
@@ -518,7 +518,7 @@ public:
 
     ~Var()
     {
-        std::cout << "(-) Var" << std::endl;
+        // std::cout << "(-) Var" << std::endl;
     }
 
     virtual std::string print()
@@ -562,7 +562,7 @@ public:
 
     ~VarType()
     {
-        std::cout << "(-) VarType" << std::endl;
+        // std::cout << "(-) VarType" << std::endl;
     }
 
     // ? Return type of variable
@@ -657,7 +657,9 @@ public:
 
     virtual void printNode(std::string space = "", std::string prefix = "") const
     {
-        std::cout << prefix << "ConstDecl" << std::endl;
+        std::cout << space << prefix << "ConstDecl" << std::endl;
+        var_->printNode(space + "│    ", "├── ");
+        type_->printNode(space + "│    ", "└── ");
     }
 
     auto *var() const
@@ -697,7 +699,7 @@ public:
 
     ~ValDecl()
     {
-        std::cout << "(-) ValDecl" << std::endl;
+        // std::cout << "(-) ValDecl" << std::endl;
     }
 
     virtual std::string print()
@@ -741,7 +743,7 @@ public:
 
     ~CompoundDecl()
     {
-        std::cout << "(-) CompoundDecl" << std::endl;
+        // std::cout << "(-) CompoundDecl" << std::endl;
         children_.clear();
     }
 

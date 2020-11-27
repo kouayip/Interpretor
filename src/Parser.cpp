@@ -13,7 +13,7 @@ auto Parser::error(std::string msg = "Type error")
 
 void Parser::consume(TokenType const(&type))
 {
-    Utils::print(currentToken_); //! Test
+    // Utils::print(currentToken_); //! Test
 
     if (currentToken_.type() == type)
     {
@@ -49,21 +49,26 @@ Node *Parser::block()
 {
     auto const block = new Block;
 
-    //? Complete list of block {If statment ...}
-    if (currentToken_.type() == TokenType::VAL ||
-        currentToken_.type() == TokenType::CONST)
+    while (currentToken_.type() != LPAREN)
     {
-        auto decl = declarations();
-        block->append(decl);
-    }
-    else if (currentToken_.type() == TokenType::ID)
-    {
-        auto assign = assignStatement();
-        block->append(assign);
-    }
-    else
-    {
-        block->append(new Empty());
+        //? Complete list of block {If statment ...}
+        if (currentToken_.type() == TokenType::VAL ||
+            currentToken_.type() == TokenType::CONST)
+        {
+            auto decl = declarations();
+            block->append(decl);
+        }
+        else if (currentToken_.type() == TokenType::ID)
+        {
+            auto assign = assignStatement();
+            consume(TokenType::SEMI);
+            block->append(assign);
+        }
+        else
+        {
+            block->append(new Empty());
+            break;
+        }
     }
 
     return block;
@@ -118,7 +123,7 @@ Node *Parser::varDeclaration(Node *(&type))
     auto const nodes = new CompoundDecl{};
     auto prevVarPosLine = -1; //? Save last position line the prev var
     auto index = -1;          //? index frist multy declaration
-    auto isMulDecl = false;   // Check is si Multy declaration or unique declaration
+    auto isMulDecl = false;   //? Check is si Multy declaration or unique declaration
     auto isAssign = false;
     while (currentToken_.type() == TokenType::ID)
     {
@@ -144,7 +149,7 @@ Node *Parser::varDeclaration(Node *(&type))
 
         auto var = variable();
 
-        nodes->append(new ValDecl{var, type});
+        nodes->append(new T{var, type});
 
         if (isAssign = (currentToken_.type() == TokenType::LASSIGN))
         {
@@ -156,7 +161,7 @@ Node *Parser::varDeclaration(Node *(&type))
                 auto size = nodes->size() - 1;
                 for (size_t i = index; i < size; i++)
                 {
-                    Utils::print(i);
+                    //! Utils::print(i);
                     mAssign->append((*nodes)[i]->reveal<ValDecl *>()->var());
                 }
 
