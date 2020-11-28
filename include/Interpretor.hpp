@@ -2,24 +2,83 @@
 #define __INTERPRETOR__
 
 #include "../include/AST.hpp"
+#include "Utils.hpp"
+#include <map>
 
 class Interpretor
 {
 private:
+    //? Test A Global scone
+    std::map<std::string, double> GLOBAL_SCOPE_;
+    std::map<std::string, std::string> SYMBOLE_;
+    /**
+     * Visit node Program
+     */
+    void visitNodeProgram(Program *program);
+
+    /**
+     * Visit node Block
+     */
+    void visitNodeBlock(Block *block);
+
+    /**
+     * Visit node CompoundDecl
+     */
+    void visitNodeCompoundDecl(CompoundDecl *decl);
+
+    /**
+     * Visit node ConstDecl
+     */
+    void visitNodeConstDecl(ConstDecl *decl);
+
+    /**
+     * Visit node ValDecl
+     */
+    void visitNodeValDecl(ValDecl *decl);
+
+    /**
+     * Visit node Assign
+     */
+    void visitNodeAssign(Assign *assign);
+
+    /**
+     * Visit node MultAssign
+     */
+    void visitNodeMultAssign(MultAssign *assign);
+
+    /**
+     * Visit node VarType
+     */
+    auto visitNodeVarType(VarType *type);
+
+    /**
+     * Visit node Var
+     */
+    template <typename T>
+    T visitNodeVar(Var *var);
+
     /**
      * Visit node Num
      */
-    auto visitNodeNum(Num *num);
+    template <typename T>
+    T visitNodeNum(Num *num);
 
     /**
      * Visit node UnaryOp
      */
-    double visitUnaryOp(UnaryOp *node);
+    template <typename T>
+    T visitNodeUnaryOp(UnaryOp *node);
 
     /**
      * Visit node BinOp
      */
-    double visitNodeBinOp(BinOp *node);
+    template <typename T>
+    T visitNodeBinOp(BinOp *node);
+
+    /**
+     * Visit node Empty
+     */
+    void visitNodeEmpty(Empty *empty);
 
     /**
      * After visit, close a node and free heaps
@@ -29,7 +88,14 @@ private:
     /**
      * Visit node
      */
-    auto visitNode(Node *node);
+    template <typename T>
+    T visitNode(Node *node);
+
+    /**
+     * Visit node
+     */
+    template <typename T>
+    T visit(T node);
 
 public:
     ~Interpretor();
@@ -37,7 +103,7 @@ public:
     /**
      * Interpret a Tree code AST
      */
-    double interpret(Node *node); //?Test: interpret return double
+    void interpret(Node *node); //?Test: interpret return double
 };
 
 #endif

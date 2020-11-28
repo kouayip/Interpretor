@@ -49,26 +49,34 @@ Node *Parser::block()
 {
     auto const block = new Block;
 
-    while (currentToken_.type() != LPAREN)
+    try
     {
-        //? Complete list of block {If statment ...}
-        if (currentToken_.type() == TokenType::VAL ||
-            currentToken_.type() == TokenType::CONST)
+        while (currentToken_.type() != LPAREN)
         {
-            auto decl = declarations();
-            block->append(decl);
+            //? Complete list of block {If statment ...}
+            if (currentToken_.type() == TokenType::VAL ||
+                currentToken_.type() == TokenType::CONST)
+            {
+                auto decl = declarations();
+                block->append(decl);
+            }
+            else if (currentToken_.type() == TokenType::ID)
+            {
+                auto assign = assignStatement();
+                consume(TokenType::SEMI);
+                block->append(assign);
+            }
+            else
+            {
+                block->append(new Empty());
+                break;
+            }
         }
-        else if (currentToken_.type() == TokenType::ID)
-        {
-            auto assign = assignStatement();
-            consume(TokenType::SEMI);
-            block->append(assign);
-        }
-        else
-        {
-            block->append(new Empty());
-            break;
-        }
+    }
+    catch (const std::exception &e)
+    {
+        Tools::freeTree(block);
+        std::cerr << e.what() << '\n';
     }
 
     return block;
@@ -227,6 +235,8 @@ Node *Parser::typeSpec()
         consume(TokenType::BOOL);
     else if (currentToken_.type() == TokenType::AUTO)
         consume(TokenType::AUTO);
+    else
+        throw error();
 
     consume(TokenType::GTHAN);
 

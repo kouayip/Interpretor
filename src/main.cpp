@@ -2,9 +2,6 @@
 
 #include "../include/Parser.hpp"
 #include "../include/Interpretor.hpp"
-#include "../include/Asset.hpp"
-#include "../include/Type.hpp"
-#include "../include/Tools.hpp"
 
 //TODO: Geret la gestion de la memoire des tree AST
 int main(int argc, char **argv)
@@ -14,8 +11,8 @@ int main(int argc, char **argv)
 
     try
     {
-        //? Test Lexer
-        // Lexer lex{source};
+        // //? Test Lexer
+        // Lexer lex{Tools::readFile(argv[1])};
         // while (true)
         // {
         //     auto token = lex.getNextToken();
@@ -34,12 +31,10 @@ int main(int argc, char **argv)
         auto inter = Interpretor{};
 
         ast->printNode();
+
+        inter.interpret(ast);
+
         Tools::freeTree(ast);
-
-        // inter.interpret(ast);
-
-        // remove(ast);
-        // inter.clearRes();
     }
     catch (const std::exception &e)
     {

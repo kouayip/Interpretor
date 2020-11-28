@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Lexer.hpp"
 #include "./Utils.hpp"
+#include "./Tools.hpp"
 #include "./AST.hpp"
 
 class Parser

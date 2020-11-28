@@ -1,17 +1,16 @@
-#ifndef __freeTreeZER__
-#define __freeTreeZER__
+#if !defined(__TOOLS__)
+#define __TOOLS__
 
 #include <fstream>
-
 #include "AST.hpp"
 #include "Utils.hpp"
 
-namespace Tools
+struct Tools
 {
     /**
      * Use to clean all node to the tree
      */
-    void freeTree(Node *node, bool isShared_ = false)
+    static void freeTree(Node *node, bool isShared_ = false)
     {
         if (node == nullptr || node == NULL)
             return;
@@ -25,13 +24,13 @@ namespace Tools
         }
         else if (node->type() == NodeType::BLOCK)
         {
-            auto blog = static_cast<Block *>(node);
-            for (size_t i = 0; i < blog->size(); i++)
+            auto block = static_cast<Block *>(node);
+            for (size_t i = 0; i < block->size(); i++)
             {
-                freeTree((*blog)[i], true);
+                freeTree((*block)[i], true);
             }
-            delete blog;
-            blog = nullptr;
+            delete block;
+            block = nullptr;
         }
         else if (node->type() == NodeType::COMPOUNDDECL)
         {
@@ -133,7 +132,7 @@ namespace Tools
     /**
      * Read content file source;
      */
-    const std::string readFile(char *path)
+    static const std::string readFile(char *path)
     {
         std::ifstream infile(path);
         std::string line;
@@ -145,7 +144,6 @@ namespace Tools
 
         return lines;
     }
-
-} // namespace Tools
+};
 
 #endif

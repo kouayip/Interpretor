@@ -1,10 +1,10 @@
 CC = g++ # compilateur
-CFLAGS = -c -g #options de compilation (debug par exemple)
+CFLAGS = -c -std=gnu++17 -g #options de compilation (debug par exemple)
 LDFLAGS = -g #options de link (librairies)
 SRC = ${wildcard src/*.cpp} # création automatique de la liste des sources
 HDR = ${wildcard include/*.hpp} # création automatique de la liste des sources
 OBJ = ${SRC:.cpp=.o}
-EXEC = main
+EXEC = trader
  
 all: ${SRC} ${OBJ} ${EXEC}
  

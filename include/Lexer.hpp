@@ -39,6 +39,11 @@ private:
     void skipWhitespace();
 
     /**
+     * Skip comment
+     */
+    void skipComment();
+
+    /**
      * Advance the cursor to the buffer
      * * Advance cursor and change a current position char to buffer
      * ? The methode update property {currentChar_, cursor_}

@@ -63,6 +63,22 @@ void Lexer::skipWhitespace()
     }
 }
 
+void Lexer::skipComment()
+{
+    if (currentChar_ == '/') // one line comment
+    {
+        while (currentChar_ != '\0' && currentChar_ != '\n')
+            advance();
+    }
+    else // multy line comment
+    {
+        while (currentChar_ != '\0' && !(currentChar_ == '*' && look() == '/'))
+            advance();
+        advance();
+    }
+    advance();
+}
+
 auto Lexer::identifier()
 {
     const auto lt = getLocation();
@@ -112,6 +128,14 @@ const Token Lexer::getNextToken() //? Update laster
             advance();
             if (std::isspace(look()))
                 skipWhitespace();
+            continue;
+        }
+
+        //* Check is a def comment
+        if (currentChar_ == '/' && (look() == '/' || look() == '*'))
+        {
+            advance();
+            skipComment();
             continue;
         }
 

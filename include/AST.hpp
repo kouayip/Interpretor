@@ -76,7 +76,7 @@ public:
 
     virtual std::string print()
     {
-        return "Empty Node";
+        return "Empty";
     }
 
     virtual void printNode(std::string space, std::string prefix) const
@@ -104,7 +104,6 @@ public:
 
     virtual std::string print()
     {
-        std::cout << value_ << std::endl;
         return "Num";
     }
 
@@ -311,7 +310,7 @@ public:
      * @param name string
      * @param block Compound
      */
-    Program(std::string const(&name), Node *const &block) : block_(block)
+    Program(std::string const(&name), Node *const &block) : name_(name), block_(block)
     {
         type_ = NodeType::PROGRAM;
     }
@@ -549,6 +548,9 @@ public:
     }
 };
 
+/**
+ * VarType
+ */
 class VarType : public Node
 {
 public:
@@ -704,7 +706,7 @@ public:
 
     virtual std::string print()
     {
-        return "AutoDecl";
+        return "ValDecl";
     }
 
     virtual void printNode(std::string space = "", std::string prefix = "") const

@@ -1,16 +1,30 @@
+
 ((
-    const<int>
+    //? Defined a const integer
+    val<int>
     {
-        x <- 10 + 9, y <- 3,
-        v,
-        z <- 7 + 3 * (10 / (12 / (3 + 1) - 1)) / (2 + 3) - 5 - 3 + (8)
+        x <- 10 + 9,
+        y <- 3.98,
+        z <- 7 + 3,
     };
 
-    name <- a;
+    //? Assign a var {name} to value of var {a}
+    x <- z + 2;
 
-    game <- 12 + 12;
+    //? Assign a var {game} to a math [expr]
+    z <- 12.23;
+ 
+    //? Comment on multiple lines
+    /****
+    
+        STYLFY C.O.D.E
+    
+    ****/
+    //? Comment on a line
 
-    voyou <- name;
 
+    y <- 5;
+    
     //val<auto> n <- 34;
+
 ))
