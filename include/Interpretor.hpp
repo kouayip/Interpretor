@@ -1,16 +1,18 @@
 #ifndef __INTERPRETOR__
 #define __INTERPRETOR__
 
-#include "../include/AST.hpp"
-#include "Utils.hpp"
 #include <map>
+#include "AST.hpp"
+#include "Utils.hpp"
+#include "SematicAnalyzer.hpp"
+#include "Tools.hpp"
 
 class Interpretor
 {
 private:
     //? Test A Global scone
     std::map<std::string, double> GLOBAL_SCOPE_;
-    std::map<std::string, std::string> SYMBOLE_;
+
     /**
      * Visit node Program
      */
@@ -98,6 +100,7 @@ private:
     T visit(T node);
 
 public:
+    Interpretor();
     ~Interpretor();
 
     /**

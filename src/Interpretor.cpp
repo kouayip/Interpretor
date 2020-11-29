@@ -1,5 +1,9 @@
 #include "../include/Interpretor.hpp"
 
+Interpretor::Interpretor()
+{
+}
+
 void Interpretor::close(Node *node)
 {
     delete node;
@@ -99,35 +103,19 @@ void Interpretor::visitNodeCompoundDecl(CompoundDecl *decl)
 // {
 // }
 
-void Interpretor::visitNodeValDecl(ValDecl *decl) //! Test
+void Interpretor::visitNodeValDecl(ValDecl *decl)
 {
-    const auto name = decl->var()->reveal<Var *>()->name();
-    const auto type = decl->type()->reveal<VarType *>()->type();
-    SYMBOLE_.insert({name, type});
 }
 
-void Interpretor::visitNodeAssign(Assign *assign) //! Change a return type
+void Interpretor::visitNodeAssign(Assign *assign)
 {
-    const auto name = assign->left()->reveal<Var *>()->name();
-    if (SYMBOLE_.at(name) == "int")
-    {
-        auto val = visitNode<int>(assign->right());
-        Utils::print(std::string(name + " <---- " + std::to_string(val)));
-        GLOBAL_SCOPE_.insert({name, val});
-    }
-    else
-    {
-        auto val = visitNode<double>(assign->right());
-        Utils::print(std::string(name + " <---- " + std::to_string(val)));
-        GLOBAL_SCOPE_.insert({name, val});
-    }
 }
 
 // auto Interpretor::visitNodeMultAssign(MultAssign *assign)
 // {
 // }
 
-auto Interpretor::visitNodeVarType(VarType *type) //! Test
+auto Interpretor::visitNodeVarType(VarType *type)
 {
     return type->type();
 }
@@ -135,11 +123,6 @@ auto Interpretor::visitNodeVarType(VarType *type) //! Test
 template <class T>
 T Interpretor::visitNodeVar(Var *var)
 {
-    const auto name = var->name();
-    if (GLOBAL_SCOPE_.find(name) != GLOBAL_SCOPE_.end())
-        return GLOBAL_SCOPE_.at(name);
-    else
-        throw std::runtime_error(std::string("Error: " + name + " has not been declared"));
 }
 
 template <class T>
@@ -190,13 +173,25 @@ T Interpretor::visitNodeBinOp(BinOp *node) //! convert to Return real type
 
 void Interpretor::interpret(Node *node)
 {
-    visitNode<void>(node);
-    std::cout << '{' << std::endl;
-    for (auto itr = GLOBAL_SCOPE_.begin(); itr != GLOBAL_SCOPE_.end(); ++itr) //! Test get all var declare to scope
+    try
     {
-        std::cout << itr->first << ": " << itr->second << ',' << '\n';
+        auto analyzer = SematicAnalyzer();
+        analyzer.visitNode(node);
+        analyzer.printSymbolTable();
     }
-    std::cout << '}' << std::endl;
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
+    // visitNode<void>(node);
+
+    // std::cout << '{' << std::endl;
+    // for (auto itr = GLOBAL_SCOPE_.begin(); itr != GLOBAL_SCOPE_.end(); ++itr) //! Test get all var declare to scope
+    // {
+    //     std::cout << itr->first << ": " << itr->second << ',' << '\n';
+    // }
+    // std::cout << '}' << std::endl;
 }
 
 Interpretor::~Interpretor()
