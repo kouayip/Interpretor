@@ -17,6 +17,9 @@ enum TokenType
     BOOL,    // (boolean)
     AUTO,    // (auto)
 
+    //? Identity type function
+    FUNC, // (func)
+
     //? Arithmetic Operator
     PLUS,  // (+)
     MINUS, // (-)
@@ -90,6 +93,9 @@ inline std::ostream &operator<<(std::ostream &op, TokenType type)
         break;
     case TokenType::AUTO:
         op << "AUTO";
+        break;
+    case TokenType::FUNC:
+        op << "FUNC";
         break;
     case TokenType::PLUS:
         op << "PLUS";

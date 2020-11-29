@@ -44,6 +44,11 @@ private:
     Node *constDeclaration();
 
     /**
+     * Function declaration 
+     */
+    Node *funcDeclaration();
+
+    /**
      * Variable
      */
     Node *variable();

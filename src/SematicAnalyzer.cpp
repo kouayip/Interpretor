@@ -79,6 +79,10 @@ void SematicAnalyzer::visitNodeValDecl(ValDecl *decl)
     auto type = decl->type()
                     ->reveal<VarType *>()
                     ->type();
+
+    if (!symtab_.hasKey(type))
+        throw std::runtime_error(std::string("Error: Symbol type '" + type + "' is not defined"));
+
     auto symbolType = symtab_.lookup(type);
     auto varName = decl->var()
                        ->reveal<Var *>()

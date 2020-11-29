@@ -18,6 +18,7 @@ enum NodeType
     VARDECL,
     CONSTDECL,
     VALDECL,
+    FUNCDECL,
     VARTYPE,
     DECL,
     ASSIGN,
@@ -664,12 +665,12 @@ public:
         type_->printNode(space + "│    ", "└── ");
     }
 
-    auto *var() const
+    auto var() const
     {
         return this->var_;
     }
 
-    auto *type() const
+    auto type() const
     {
         return this->type_;
     }
@@ -677,6 +678,57 @@ public:
 private:
     Node *var_;
     Node *type_;
+};
+
+/**
+ * Function Declaration
+ */
+class FuncDecl : public Node
+{
+private:
+    std::string name_;
+    Node *returnType_;
+    Node *block_;
+
+public:
+    /**
+     * @param var VarType
+     * @param type Var
+     */
+    FuncDecl(std::string const(&name), Node *type, Node *block) : name_(name), returnType_(type), block_(block)
+    {
+        Node::type_ = NodeType::FUNCDECL;
+    }
+
+    virtual std::string print()
+    {
+        return "FuncDecl";
+    }
+
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "FuncDecl<" << name_ << ">" << std::endl;
+        returnType_->printNode(space + "│    ", "├── ");
+        block_->printNode(space + "│    ", "├── ");
+    }
+
+    /**
+     * @return Compound block
+     */
+    const auto block() noexcept
+    {
+        return block_;
+    }
+
+    auto name() noexcept
+    {
+        return this->name_;
+    }
+
+    auto type() noexcept
+    {
+        return returnType_;
+    }
 };
 
 /**

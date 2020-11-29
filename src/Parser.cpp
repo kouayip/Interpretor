@@ -60,6 +60,11 @@ Node *Parser::block()
                 auto decl = declarations();
                 block->append(decl);
             }
+            else if (currentToken_.type() == TokenType::FUNC)
+            {
+                auto funcDecl = declarations();
+                block->append(funcDecl);
+            }
             else if (currentToken_.type() == TokenType::ID)
             {
                 auto assign = assignStatement();
@@ -89,7 +94,6 @@ Node *Parser::declarations()
         consume(TokenType::VAL);
         auto type = typeSpec();
         auto decs = varDeclaration<ValDecl>(type);
-
         consume(TokenType::SEMI);
         return decs;
     }
@@ -100,6 +104,13 @@ Node *Parser::declarations()
         auto decs = varDeclaration<ConstDecl>(type);
         consume(TokenType::SEMI);
         return decs;
+    }
+    else if (currentToken_.type() == TokenType::FUNC)
+    {
+        consume(TokenType::FUNC);
+        auto func = funcDeclaration();
+        consume(TokenType::SEMI);
+        return func;
     }
 
     throw error();
@@ -197,6 +208,21 @@ Node *Parser::varDeclaration(Node *(&type))
 Node *Parser::constDeclaration() //TODO: Refact code to Generic Declaration
 {
     return nullptr; //! Test
+}
+
+Node *Parser::funcDeclaration()
+{
+    auto returnType = typeSpec();
+    auto funcName = currentToken_.value();
+    consume(TokenType::ID);
+    //TODO: Get function parameters to (type:val...)
+    consume(TokenType::LCURLY);
+
+    auto block = this->block(); //? Block declaration into function
+
+    auto decl = new FuncDecl(funcName, returnType, block);
+    consume(TokenType::RCURLY);
+    return decl;
 }
 
 Node *Parser::assignStatement()

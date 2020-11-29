@@ -83,8 +83,9 @@ private:
 public:
     SymbolTable() //? Defined a default type
     {
-        insert(new BuildTypeSymbol("float"));
+        insert(new BuildTypeSymbol("auto"));
         insert(new BuildTypeSymbol("int"));
+        insert(new BuildTypeSymbol("float"));
     }
 
     void insert(Symbol *symbol) noexcept
