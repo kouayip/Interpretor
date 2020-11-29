@@ -24,17 +24,16 @@
     ****/
     //? Comment on a line
 
-
     x <- 5 + + (-12*2) --- l;
     
     val<auto> n <- 34;
 
     // (int:a, int:b)
 
-    func<int> add
+    //? Function declaration
+    func<int> add(int:x, int:y)
     {
-        val<float> result;
-        result <- 0;
+        val<float> result <- 0;
         // return a + b;
     };
 

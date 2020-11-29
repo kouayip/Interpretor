@@ -28,8 +28,8 @@ enum TokenType
     MOD,   // (%)
 
     //? Special symbols
-    LPAREN, // <)>
-    RPAREN, // <(>
+    LPAREN, // <(>
+    RPAREN, // <)>
     LCURLY, // <{>
     RCURLY, // <}>
     COLON,  // <:>

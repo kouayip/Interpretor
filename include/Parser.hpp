@@ -49,6 +49,11 @@ private:
     Node *funcDeclaration();
 
     /**
+     * Function declaration 
+     */
+    Node *funcParameters();
+
+    /**
      * Variable
      */
     Node *variable();

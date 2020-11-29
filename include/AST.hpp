@@ -19,6 +19,7 @@ enum NodeType
     CONSTDECL,
     VALDECL,
     FUNCDECL,
+    FUNCPARAMS,
     VARTYPE,
     DECL,
     ASSIGN,
@@ -688,6 +689,7 @@ class FuncDecl : public Node
 private:
     std::string name_;
     Node *returnType_;
+    Node *params_;
     Node *block_;
 
 public:
@@ -695,7 +697,7 @@ public:
      * @param var VarType
      * @param type Var
      */
-    FuncDecl(std::string const(&name), Node *type, Node *block) : name_(name), returnType_(type), block_(block)
+    FuncDecl(std::string const(&name), Node *type, Node *params, Node *block) : name_(name), returnType_(type), params_(params), block_(block)
     {
         Node::type_ = NodeType::FUNCDECL;
     }
@@ -709,6 +711,7 @@ public:
     {
         std::cout << space << prefix << "FuncDecl<" << name_ << ">" << std::endl;
         returnType_->printNode(space + "│    ", "├── ");
+        params_->printNode(space + "│    ", "├── ");
         block_->printNode(space + "│    ", "├── ");
     }
 
@@ -728,6 +731,53 @@ public:
     auto type() noexcept
     {
         return returnType_;
+    }
+};
+
+class FuncParams : public Node
+{
+private:
+    std::vector<Node *> params_;
+
+public:
+    FuncParams()
+    {
+        Node::type_ = NodeType::FUNCPARAMS;
+    }
+
+    ~FuncParams()
+    {
+        // std::cout << "(-) CompoundDecl" << std::endl;
+        params_.clear();
+    }
+
+    void append(Node *const &child)
+    {
+        params_.push_back(child);
+    }
+
+    inline Node *operator[](std::size_t idx) noexcept
+    {
+        return params_[idx];
+    }
+
+    const int size() noexcept
+    {
+        return params_.size();
+    }
+
+    virtual std::string print()
+    {
+        return "FuncParams";
+    }
+
+    virtual void printNode(std::string space = "", std::string prefix = "") const
+    {
+        std::cout << space << prefix << "FuncParams" << std::endl;
+        for (size_t i = 0; i < params_.size(); i++)
+        {
+            params_[i]->printNode(space + "│    ", "├── ");
+        }
     }
 };
 

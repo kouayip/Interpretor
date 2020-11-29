@@ -190,6 +190,9 @@ const Token Lexer::getNextToken() //? Update laster
         case ';':
             advance();
             return Token{TokenType::SEMI, ';', lt};
+        case ':':
+            advance();
+            return Token{TokenType::COLON, ':', lt};
         case ',':
             advance();
             return Token{TokenType::COMMA, ',', lt};

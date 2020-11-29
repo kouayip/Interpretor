@@ -92,7 +92,9 @@ Node *Parser::declarations()
     if (currentToken_.type() == TokenType::VAL)
     {
         consume(TokenType::VAL);
+        consume(TokenType::LTHAN);
         auto type = typeSpec();
+        consume(TokenType::GTHAN);
         auto decs = varDeclaration<ValDecl>(type);
         consume(TokenType::SEMI);
         return decs;
@@ -100,7 +102,9 @@ Node *Parser::declarations()
     else if (currentToken_.type() == TokenType::CONST)
     {
         consume(TokenType::CONST);
+        consume(TokenType::LTHAN);
         auto type = typeSpec();
+        consume(TokenType::GTHAN);
         auto decs = varDeclaration<ConstDecl>(type);
         consume(TokenType::SEMI);
         return decs;
@@ -212,17 +216,51 @@ Node *Parser::constDeclaration() //TODO: Refact code to Generic Declaration
 
 Node *Parser::funcDeclaration()
 {
+    consume(TokenType::LTHAN);
     auto returnType = typeSpec();
+    consume(TokenType::GTHAN);
+
     auto funcName = currentToken_.value();
     consume(TokenType::ID);
-    //TODO: Get function parameters to (type:val...)
+
+    auto params = funcParameters();
+
     consume(TokenType::LCURLY);
-
     auto block = this->block(); //? Block declaration into function
-
-    auto decl = new FuncDecl(funcName, returnType, block);
     consume(TokenType::RCURLY);
-    return decl;
+
+    return new FuncDecl(funcName, returnType, params, block);
+}
+
+Node *Parser::funcParameters()
+{
+    consume(TokenType::LPAREN);
+
+    if (currentToken_.type() == TokenType::RPAREN)
+    {
+        consume(TokenType::RPAREN);
+        return new Empty();
+    }
+
+    auto params = new FuncParams();
+
+    auto getParams = [&]() { //? Lamda expresion to get a val params declaration
+        auto type = typeSpec();
+        consume(TokenType::COLON);
+        auto var = variable();
+        params->append(new ValDecl{var, type});
+    };
+
+    getParams(); //? Get a first params
+
+    while (currentToken_.type() != TokenType::RPAREN && currentToken_.type() == TokenType::COMMA)
+    {
+        consume(TokenType::COMMA);
+        getParams();
+    }
+
+    consume(TokenType::RPAREN);
+    return params;
 }
 
 Node *Parser::assignStatement()
@@ -247,7 +285,7 @@ Node *Parser::variable()
 
 Node *Parser::typeSpec()
 {
-    consume(TokenType::LTHAN);
+    // consume(TokenType::LTHAN);
 
     const auto token = currentToken_;
 
@@ -264,7 +302,7 @@ Node *Parser::typeSpec()
     else
         throw error();
 
-    consume(TokenType::GTHAN);
+    // consume(TokenType::GTHAN);
 
     return new VarType(token);
 }
