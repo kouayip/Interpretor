@@ -51,7 +51,7 @@ Node *Parser::block()
 
     try
     {
-        while (currentToken_.type() != LPAREN)
+        while (currentToken_.type() != RPAREN)
         {
             //? Complete list of block {If statment ...}
             if (currentToken_.type() == TokenType::VAL ||
@@ -73,7 +73,7 @@ Node *Parser::block()
             }
             else
             {
-                block->append(new Empty());
+                // block->append(new Empty());
                 break;
             }
         }
@@ -236,19 +236,19 @@ Node *Parser::funcParameters()
 {
     consume(TokenType::LPAREN);
 
+    auto params = new FuncParams();
+
     if (currentToken_.type() == TokenType::RPAREN)
     {
         consume(TokenType::RPAREN);
-        return new Empty();
+        params->append(new Empty());
+        return params;
     }
-
-    auto params = new FuncParams();
 
     auto getParams = [&]() { //? Lamda expresion to get a val params declaration
         auto type = typeSpec();
         consume(TokenType::COLON);
-        auto var = variable();
-        params->append(new ValDecl{var, type});
+        params->append(new ValDecl{variable(), type});
     };
 
     getParams(); //? Get a first params

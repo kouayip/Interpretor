@@ -1,8 +1,12 @@
 #include "../include/SematicAnalyzer.hpp"
 
+SematicAnalyzer::SematicAnalyzer()
+{
+}
+
 void SematicAnalyzer::printSymbolTable()
 {
-    symtab_.print();
+    // currentCope_.print();
 }
 
 void SematicAnalyzer::visitNode(Node *node)
@@ -22,6 +26,12 @@ void SematicAnalyzer::visitNode(Node *node)
         break;
     case NodeType::VALDECL:
         visitNodeValDecl(node->reveal<ValDecl *>());
+        break;
+    case NodeType::FUNCDECL:
+        return visitNodeFuncDecl(node->reveal<FuncDecl *>());
+        break;
+    case NodeType::FUNCPARAMS:
+        return visitNodeFuncParams(node->reveal<FuncParams *>());
         break;
     case NodeType::ASSIGN:
         visitNodeAssign(node->reveal<Assign *>());
@@ -49,7 +59,20 @@ void SematicAnalyzer::visitNode(Node *node)
 
 void SematicAnalyzer::visitNodeProgram(Program *program)
 {
+    Utils::print(std::string("ENTER scope: global"));
+    auto globalScope = new ScopedSymbolTable("global", 1);
+    this->currentCope_ = globalScope;
+
     visitNode(program->block());
+
+    globalScope->print();
+
+    this->currentCope_ = this->currentCope_->enclosingScope_;
+
+    Utils::print(std::string("LEAVE scope: global"));
+
+    delete globalScope;
+    globalScope = nullptr;
 }
 
 void SematicAnalyzer::visitNodeBlock(Block *block)
@@ -80,19 +103,75 @@ void SematicAnalyzer::visitNodeValDecl(ValDecl *decl)
                     ->reveal<VarType *>()
                     ->type();
 
-    if (!symtab_.hasKey(type))
+    auto symbolType = currentCope_->lookup(type);
+
+    if (symbolType)
         throw std::runtime_error(std::string("Error: Symbol type '" + type + "' is not defined"));
 
-    auto symbolType = symtab_.lookup(type);
     auto varName = decl->var()
                        ->reveal<Var *>()
                        ->name();
 
-    if (symtab_.hasKey(varName)) //* Check is var exist
+    if (currentCope_->hasKey(varName)) //* Check is var exist
         throw std::runtime_error(std::string("Error: Duplicate Symbol '" + varName + "'"));
 
     auto varSymbole = new ValSymbol(varName, symbolType);
-    symtab_.insert(varSymbole);
+    currentCope_->insert(varSymbole);
+}
+
+void SematicAnalyzer::visitNodeFuncDecl(FuncDecl *decl)
+{
+    auto funName = decl->name();
+    auto funType = decl->type()
+                       ->reveal<VarType *>()
+                       ->type();
+
+    auto funSymbol = new FuncSymbol(funName, currentCope_->lookup(funType));
+    currentCope_->insert(funSymbol);
+
+    Utils::print("ENTER scope: " + funName);
+    auto funScope = new ScopedSymbolTable(
+        funName,
+        this->currentCope_->getLevel() + 1,
+        this->currentCope_);
+
+    currentCope_ = funScope;
+
+    auto params = decl->params()->reveal<FuncParams *>();
+    for (size_t i = 0; i < params->size(); i++)
+    {
+        auto valDecl = (*params)[i]->reveal<ValDecl *>();
+        auto type = valDecl->type()
+                        ->reveal<VarType *>()
+                        ->type();
+        auto paramType = currentCope_->lookup(type);
+
+        auto paramName = valDecl->var()
+                             ->reveal<Var *>()
+                             ->name();
+
+        auto varSymbole = new ValSymbol(paramName, paramType);
+        currentCope_->insert(varSymbole);
+        funSymbol->append(varSymbole);
+    }
+
+    visitNode(decl->block());
+
+    funScope->print();
+
+    this->currentCope_ = currentCope_->enclosingScope_;
+
+    Utils::print(std::string("LEAVE scope: " + funName));
+    delete funScope;
+    funScope = nullptr;
+}
+
+void SematicAnalyzer::visitNodeFuncParams(FuncParams *params)
+{
+    for (size_t i = 0; i < params->size(); i++)
+    {
+        visitNode((*params)[i]);
+    }
 }
 
 void SematicAnalyzer::visitNodeAssign(Assign *assign)
@@ -108,7 +187,7 @@ void SematicAnalyzer::visitNodeMultAssign(MultAssign *assign) //TODO: Analyse mu
 void SematicAnalyzer::visitNodeVar(Var *var)
 {
     const auto varName = var->name();
-    auto varSymbole = symtab_.lookup(varName);
+    auto varSymbole = currentCope_->lookup(varName);
 
     if (!varSymbole)
         throw std::runtime_error(std::string("Error: Symbol '" + varName + "' has not been declared"));
@@ -125,4 +204,13 @@ void SematicAnalyzer::visitNodeBinOp(BinOp *node)
 {
     visitNode(node->left());
     visitNode(node->right());
+}
+
+SematicAnalyzer::~SematicAnalyzer()
+{
+    if (currentCope_ != nullptr)
+    {
+        delete currentCope_;
+        currentCope_ = nullptr;
+    }
 }

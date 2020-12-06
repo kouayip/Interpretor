@@ -1,4 +1,3 @@
-
 ((
     //? Defined a const integer
     val<int> //TODO: Check a const declaraion 
@@ -18,12 +17,11 @@
  
     //? Comment on multiple lines
     /****
-    
+
         STYLFY C.O.D.E
     
     ****/
     //? Comment on a line
-
     x <- 5 + + (-12*2) --- l;
     
     val<auto> n <- 34;
@@ -33,7 +31,7 @@
     //? Function declaration
     func<int> add(int:x, int:y)
     {
-        val<float> result <- 0;
+        val<float> result <- 0 + x + n;
         // return a + b;
     };
 

@@ -2,6 +2,7 @@
 #define __SEMATICANALYZER__
 
 #include "AST.hpp"
+#include "Utils.hpp"
 #include "Symbol.hpp"
 
 /**
@@ -11,7 +12,7 @@
 class SematicAnalyzer
 {
 private:
-    SymbolTable symtab_;
+    ScopedSymbolTable *currentCope_;
 
     /**
      * Visit node Program
@@ -37,6 +38,16 @@ private:
      * Visit node ValDecl
      */
     void visitNodeValDecl(ValDecl *decl);
+
+    /**
+     * Visit node FuncDecl
+     */
+    void visitNodeFuncDecl(FuncDecl *decl);
+
+    /**
+     * Visit node ValDecl
+     */
+    void visitNodeFuncParams(FuncParams *params);
 
     /**
      * Visit node Assign
@@ -71,13 +82,15 @@ private:
     void visitNodeEmpty(Empty *empty);
 
 public:
+    SematicAnalyzer();
+    ~SematicAnalyzer();
+
     /**
      * Visit node
      */
     void visitNode(Node *node);
 
     /**
-     * 
      */
     void printSymbolTable();
 };

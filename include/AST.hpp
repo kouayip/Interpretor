@@ -732,6 +732,11 @@ public:
     {
         return returnType_;
     }
+
+    auto params() noexcept
+    {
+        return params_;
+    }
 };
 
 class FuncParams : public Node

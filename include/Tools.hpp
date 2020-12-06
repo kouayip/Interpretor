@@ -66,6 +66,25 @@ struct Tools
             delete cst;
             cst = nullptr;
         }
+        else if (node->type() == NodeType::FUNCDECL)
+        {
+            auto func = node->reveal<FuncDecl *>();
+            freeTree(func->type());
+            freeTree(func->params());
+            freeTree(func->block());
+            delete func;
+            func = nullptr;
+        }
+        else if (node->type() == NodeType::FUNCPARAMS)
+        {
+            auto params = node->reveal<FuncParams *>();
+            for (size_t i = 0; i < params->size(); i++)
+            {
+                freeTree((*params)[i], true);
+            }
+            delete params;
+            params = nullptr;
+        }
         else if (node->type() == NodeType::VAR)
         {
             auto var = node->reveal<Var *>();
