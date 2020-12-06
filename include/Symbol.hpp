@@ -168,9 +168,8 @@ public:
         std::cout << "Lookup: " << key << ". (Scope name: " << (enclosingScope_ ? enclosingScope_->name_ : "None") << ")" << '\n'; //! Test look content
 
         if (hasKey(key)) //? Check is key existe
-        {
             return symbols_[key];
-        }
+
         if (enclosingScope_)
             return enclosingScope_->lookup(key);
 

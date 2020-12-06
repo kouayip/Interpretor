@@ -105,7 +105,7 @@ void SematicAnalyzer::visitNodeValDecl(ValDecl *decl)
 
     auto symbolType = currentCope_->lookup(type);
 
-    if (symbolType)
+    if (!symbolType)
         throw std::runtime_error(std::string("Error: Symbol type '" + type + "' is not defined"));
 
     auto varName = decl->var()
